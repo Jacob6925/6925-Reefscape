@@ -15,14 +15,16 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.lib.CommandX3DController;
-import frc.robot.generated.TunerConstants;
+import frc.lib.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsys;
+import frc.robot.subsystems.IntakePivotSubsys;
 import frc.robot.subsystems.IntakeSubsys;
 
 public class RobotContainer {
     private final ElevatorSubsys elevatorSubsys = new ElevatorSubsys();
     private final IntakeSubsys intakeSubsys = new IntakeSubsys();
+    private final IntakePivotSubsys pivotSubsys = new IntakePivotSubsys();
 
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandX3DController operator = new CommandX3DController(1);
@@ -50,33 +52,40 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
-        drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+        // // Note that X is defined as forward according to WPILib convention,
+        // // and Y is defined as to the left according to WPILib convention.
+        // drivetrain.setDefaultCommand(
+        //     // Drivetrain will execute this command periodically
+        //     drivetrain.applyRequest(() ->
+        //         drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+        //             .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+        //             .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+        //     )
+        // );
 
-        driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        driver.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
-        ));
+        // driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        // driver.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
+        // ));
 
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // // Run SysId routines when holding back/start and X/Y.
+        // // Note that each routine should be run exactly once in a single log.
+        // driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // reset the field-centric heading on left bumper press
-        driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // // reset the field-centric heading on left bumper press
+        // driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        // drivetrain.registerTelemetry(logger::telemeterize);
+
+        driver.b().onTrue(Commands.runOnce(() -> pivotSubsys.pivotMotor.setPosition(0), pivotSubsys));
+        driver.y().onTrue(Commands.runOnce(() -> pivotSubsys.pivotMotor.setPosition(90), pivotSubsys));
+        driver.x().onTrue(Commands.runOnce(() -> pivotSubsys.pivotMotor.setPosition(180), pivotSubsys));
+        driver.a().onTrue(Commands.runOnce(() -> pivotSubsys.pivotMotor.setPosition(270), pivotSubsys));
+
+        pivotSubsys.setDefaultCommand(Commands.runOnce(() -> pivotSubsys.pivotMotor.set(driver.getLeftX()), pivotSubsys));
     }
 
     public Command getAutonomousCommand() {

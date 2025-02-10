@@ -14,4 +14,29 @@ package frc.robot;
  */
 public final class Constants {
   public static final CTREConfigs Configs = new CTREConfigs();
+  
+  public static final class ElevatorConstants {
+    // Trapezoidal Profile Variables
+    public static final double kP = 0.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double MAX_VELOCITY = 0.0;
+    public static final double MAX_ACCEL = 0.0;
+
+    // Height Setpoints (meters)
+    public static final double HEIGHT_OF_INTAKE = 0.0;
+    public static final double MAX_HEIGHT = 0.0 - HEIGHT_OF_INTAKE;
+  }
+
+  public static final class IntakePivotConstants {
+    // Trapezoidal Profile Variables
+    public static final double kP = 0.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+    public static final double MAX_VELOCITY = 0.0;
+    public static final double MAX_ACCEL = 0.0;
+
+    // Setpoints (rotations)
+    public static final double MAX_HEIGHT = 0.0;
+  }
 }

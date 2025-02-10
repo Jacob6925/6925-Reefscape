@@ -26,7 +26,7 @@ public class IntakeSubsys extends SubsystemBase {
 	public void periodic() {}
 
 	public enum IntakeSpeed {
-		NONE(0),
+		OFF(0),
 		INTAKE(0.5),
 		EJECT(-0.5);
 

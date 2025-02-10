@@ -7,36 +7,56 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+//import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsys extends SubsystemBase {
-  private final TalonFX elevatorMotor = new TalonFX(3);
-  private final TalonFX secondElevatorMotor = new TalonFX(6);
-  private final Follower follower = new Follower(elevatorMotor.getDeviceID(), true);
+  private final TalonFX elevatorMotor = new TalonFX(25);
+  private final TalonFX secondElevatorMotor = new TalonFX(26);
+
+  private final ProfiledPIDController pidController;
 
   public ElevatorSubsys() {
     elevatorMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
-    secondElevatorMotor.setControl(follower);
+    secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), true));
+
+    pidController = new ProfiledPIDController(
+      ElevatorConstants.kP,
+      ElevatorConstants.kI,
+      ElevatorConstants.kD,
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCEL)
+    );
   }
 
-  public void setSpeed(ElevatorSpeed speed) {
-    elevatorMotor.set(speed.value);
+  public void goTo(ElevatorPosition setpoint) {
+    pidController.setGoal(setpoint.meters);
   }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    if (!DriverStation.isEnabled()) {
+      elevatorMotor.set(0);
+      return;
+    }
+
+    double out = pidController.calculate(elevatorMotor.getPosition().getValueAsDouble());
+    out = MathUtil.clamp(out, -1, 1);
+    elevatorMotor.set(out);
   }
 
-  public enum ElevatorSpeed {
-    OFF(0),
-    UP(0.5),
-    DOWN(-0.5);
+  public enum ElevatorPosition {
+    MAX_HEIGHT(ElevatorConstants.MAX_HEIGHT),
+    MIN_HEIGHT(0.0);
 
-    public final double value;
-    private ElevatorSpeed(double value) {
-      this.value = value;
+    public final double meters;
+    private ElevatorPosition(double meters) {
+      this.meters = meters;
     }
   }
 }
