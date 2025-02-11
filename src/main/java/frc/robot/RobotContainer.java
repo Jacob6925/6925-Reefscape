@@ -22,14 +22,14 @@ import frc.lib.CommandX3DController;
 import frc.lib.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsys;
-import frc.robot.subsystems.IntakePivotSubsys;
-import frc.robot.subsystems.IntakeSubsys;
+import frc.robot.subsystems.WristSubsys;
+import frc.robot.subsystems.PipeIntakeSubsys;
 
 public class RobotContainer {
     private static RobotContainer instance;
     private final ElevatorSubsys elevatorSubsys = new ElevatorSubsys();
-    private final IntakeSubsys intakeSubsys = new IntakeSubsys();
-    private final IntakePivotSubsys pivotSubsys = new IntakePivotSubsys();
+    private final PipeIntakeSubsys intakeSubsys = new PipeIntakeSubsys();
+    private final WristSubsys pivotSubsys = new WristSubsys();
 
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandX3DController operator = new CommandX3DController(1);

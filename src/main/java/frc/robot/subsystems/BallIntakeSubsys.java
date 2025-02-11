@@ -9,29 +9,28 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class IntakeSubsys extends SubsystemBase {
-	// private static final DigitalInput intakeLimitSwitch = new DigitalInput(9);
-	public final TalonFX indexerMotor =  new TalonFX(0);
+public class BallIntakeSubsys extends SubsystemBase {
+  private final TalonFX ballIntake = new TalonFX(10);
 
-	public IntakeSubsys() {
-		indexerMotor.getConfigurator().apply(Constants.Configs.INTAKE_CONFIG);
+	public BallIntakeSubsys() {
+		ballIntake.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
 	}
 
-	public void setSpeed(IntakeSpeed speed) {
-		indexerMotor.set(speed.value);
+	public void setSpeedOfBallIntake(BallIntakeSpeed speed) {
+		ballIntake.set(speed.value);
 	}
 	
 	// Called every ~20ms
 	@Override
 	public void periodic() {}
 
-	public enum IntakeSpeed {
+	public enum BallIntakeSpeed {
 		OFF(0),
 		INTAKE(0.5),
 		EJECT(-0.5);
 
 		public final double value;
-		IntakeSpeed(double value) {
+		BallIntakeSpeed(double value) {
 			this.value = value;
 		}
 	}

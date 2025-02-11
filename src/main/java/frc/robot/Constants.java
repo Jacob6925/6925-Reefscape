@@ -42,7 +42,7 @@ public final class Constants {
     public static final double MAX_HEIGHT = 0.0 - HEIGHT_OF_INTAKE;
   }
 
-  public static final class IntakePivotConstants {
+  public static final class WristConstants {
     // Trapezoidal Profile Variables
     public static final double kP = 0.0;
     public static final double kI = 0.0;
