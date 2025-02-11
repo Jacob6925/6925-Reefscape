@@ -16,14 +16,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class WristSubsys extends SubsystemBase {
-  public final TalonFX pivotMotor = new TalonFX(8);
-  private final TalonFX otherPivotMotor = new TalonFX(9);
+  public final TalonFX wristMotor = new TalonFX(8);
+  private final TalonFX wristFollowerMotor = new TalonFX(9);
 
   private final ProfiledPIDController pidController;
 
   public WristSubsys() {
-    pivotMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
-    otherPivotMotor.setControl(new Follower(pivotMotor.getDeviceID(), true));
+    wristMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
+    wristFollowerMotor.setControl(new Follower(wristMotor.getDeviceID(), true));
 
     pidController = new ProfiledPIDController(
       Constants.WristConstants.kP,
@@ -39,16 +39,16 @@ public class WristSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("rotations", pivotMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("rotations", wristMotor.getPosition().getValueAsDouble());
 
     if (!DriverStation.isEnabled()) {
-      pivotMotor.set(0);
+      wristMotor.set(0);
       return;
     }
 
-    double output = pidController.calculate(pivotMotor.getPosition().getValueAsDouble());
+    double output = pidController.calculate(wristMotor.getPosition().getValueAsDouble());
     output = MathUtil.clamp(output, -1, 1);
-    pivotMotor.set(output);
+    wristMotor.set(output);
   }
 
   public enum IntakePivotSetpoint {
