@@ -21,7 +21,7 @@ public class BallIntakeCommand extends Command {
 
   @Override
   public void initialize() {
-    ballIntakeSubsys.setSpeedOfBallIntake(speed);
+    ballIntakeSubsys.setSpeed(speed);
   }
 
   @Override
@@ -29,7 +29,7 @@ public class BallIntakeCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    ballIntakeSubsys.setSpeedOfBallIntake(BallIntakeSpeed.OFF);
+    ballIntakeSubsys.setSpeed(BallIntakeSpeed.OFF);
   }
 
   @Override
