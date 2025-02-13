@@ -5,23 +5,23 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsys;
-import frc.robot.subsystems.IntakeSubsys.IntakeSpeed;
+import frc.robot.subsystems.PipeIntakeSubsys;
+import frc.robot.subsystems.PipeIntakeSubsys.PipeIntakeSpeed;
 
 public class IntakeCommand extends Command {
-  private final IntakeSubsys intakeSubsys;
-  private final IntakeSpeed speed;
+  private final PipeIntakeSubsys pippeIntakeSubsys;
+  private final PipeIntakeSpeed speed;
 
-  public IntakeCommand(IntakeSubsys intakeSubsys, IntakeSpeed speed) {
-    addRequirements(intakeSubsys);
+  public IntakeCommand(PipeIntakeSubsys pipeIntakeSubsys, PipeIntakeSpeed speed) {
+    addRequirements(pipeIntakeSubsys);
 
-    this.intakeSubsys = intakeSubsys;
+    this.pippeIntakeSubsys = pipeIntakeSubsys;
     this.speed = speed;
   }
 
   @Override
   public void initialize() {
-    intakeSubsys.setSpeed(speed);
+    pippeIntakeSubsys.setSpeedOfPipeIntake(speed);
   }
 
   @Override
@@ -29,7 +29,7 @@ public class IntakeCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    intakeSubsys.setSpeed(IntakeSpeed.OFF);
+    pippeIntakeSubsys.setSpeedOfPipeIntake(PipeIntakeSpeed.OFF);
   }
 
   @Override

@@ -9,8 +9,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class CTREConfigs {
     public final TalonFXConfiguration ELEVATOR_CONFIG = new TalonFXConfiguration();
-    public final TalonFXConfiguration INTAKE_CONFIG = new TalonFXConfiguration();
-    public final TalonFXConfiguration INTAKE_PIVOT_CONFIG = new TalonFXConfiguration();
+    public final TalonFXConfiguration BALL_INTAKE_CONFIG = new TalonFXConfiguration();
+    public final TalonFXConfiguration PIPE_INTAKE_CONFIG = new TalonFXConfiguration();
+    public final TalonFXConfiguration WRIST_CONFIG = new TalonFXConfiguration();
 
     public CTREConfigs() {
         // Elevator Config
@@ -19,17 +20,34 @@ public class CTREConfigs {
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
+        ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
 
         ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
-        ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 40;
+        ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
 
-        // Intake Config
-        INTAKE_PIVOT_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        // Ball Intake Config
+        BALL_INTAKE_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
+        BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
+        BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
+        
+        // Pipe Intake Config
+        PIPE_INTAKE_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        PIPE_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
+        PIPE_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        PIPE_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
+        PIPE_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
 
         // Intake Pivot Config
-        INTAKE_PIVOT_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        INTAKE_PIVOT_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 100;
-        INTAKE_PIVOT_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 100;
+        WRIST_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        WRIST_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
+        WRIST_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        WRIST_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
+        WRIST_CONFIG.CurrentLimits.SupplyCurrentLimit = 100;
     }
 
     /**

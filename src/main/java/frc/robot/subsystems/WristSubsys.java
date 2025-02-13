@@ -15,21 +15,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class IntakePivotSubsys extends SubsystemBase {
-  public final TalonFX pivotMotor = new TalonFX(29);
-  private final TalonFX otherPivotMotor = new TalonFX(28);
+public class WristSubsys extends SubsystemBase {
+  public final TalonFX wristMotor = new TalonFX(8);
+  private final TalonFX wristFollowerMotor = new TalonFX(9);
 
   private final ProfiledPIDController pidController;
 
-  public IntakePivotSubsys() {
-    pivotMotor.getConfigurator().apply(Constants.Configs.INTAKE_PIVOT_CONFIG);
-    otherPivotMotor.setControl(new Follower(pivotMotor.getDeviceID(), true));
+  public WristSubsys() {
+    wristMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
+    wristFollowerMotor.setControl(new Follower(wristMotor.getDeviceID(), true));
 
     pidController = new ProfiledPIDController(
-      Constants.IntakePivotConstants.kP,
-      Constants.IntakePivotConstants.kI,
-      Constants.IntakePivotConstants.kD,
-      new TrapezoidProfile.Constraints(Constants.IntakePivotConstants.MAX_VELOCITY, Constants.IntakePivotConstants.MAX_ACCEL)
+      Constants.WristConstants.kP,
+      Constants.WristConstants.kI,
+      Constants.WristConstants.kD,
+      new TrapezoidProfile.Constraints(Constants.WristConstants.MAX_VELOCITY, Constants.WristConstants.MAX_ACCEL)
     );
   }
 
@@ -39,20 +39,20 @@ public class IntakePivotSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("rotations", pivotMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("rotations", wristMotor.getPosition().getValueAsDouble());
 
     if (!DriverStation.isEnabled()) {
-      pivotMotor.set(0);
+      wristMotor.set(0);
       return;
     }
 
-    double output = pidController.calculate(pivotMotor.getPosition().getValueAsDouble());
+    double output = pidController.calculate(wristMotor.getPosition().getValueAsDouble());
     output = MathUtil.clamp(output, -1, 1);
-    pivotMotor.set(output);
+    wristMotor.set(output);
   }
 
   public enum IntakePivotSetpoint {
-    MAX_HEIGHT(Constants.IntakePivotConstants.MAX_HEIGHT),
+    MAX_HEIGHT(Constants.WristConstants.MAX_HEIGHT),
     MIN_HEIGHT(0.0);
 
     public final double rotations;
