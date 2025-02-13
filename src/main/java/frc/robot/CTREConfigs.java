@@ -15,11 +15,11 @@ public class CTREConfigs {
 
     public CTREConfigs() {
         // Elevator Config
-        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = false; // CHANGE TO TRUE ONCE LIMIT FOUND
-        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0; // set limit
+        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 25;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
-        ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
         ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
 

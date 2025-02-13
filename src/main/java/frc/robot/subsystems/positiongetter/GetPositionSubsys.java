@@ -20,10 +20,10 @@ public class GetPositionSubsys extends SubsystemBase {
   public GetPositionSubsys(int deviceId0, int deviceId1) {
     motor = new TalonFX(deviceId0);
     motor2 = new TalonFX(deviceId1);
-    motor2.setControl(new Follower(deviceId0, true));
+    motor2.setControl(new Follower(deviceId0, false));
 
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    // config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     motor.getConfigurator().apply(config);

@@ -17,14 +17,14 @@ import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsys extends SubsystemBase {
-  private final TalonFX elevatorMotor = new TalonFX(25);
-  private final TalonFX secondElevatorMotor = new TalonFX(26);
+  private final TalonFX elevatorMotor = new TalonFX(12);
+  private final TalonFX secondElevatorMotor = new TalonFX(13);
 
   private final ProfiledPIDController pidController;
 
   public ElevatorSubsys() {
     elevatorMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
-    secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), true));
+    secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), false));
 
     pidController = new ProfiledPIDController(
       ElevatorConstants.kP,
