@@ -44,19 +44,19 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    // GetPositionSubsys getPositionElevatorSubsys = new GetPositionSubsys(
-    //     "Elevator",
-    //     12,
-    //     13,
-    //     false,
-    //     (subsys, motor) -> {
-    //         motor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
+    GetPositionSubsys getPositionElevatorSubsys = new GetPositionSubsys(
+        "Elevator",
+        12,
+        13,
+        false,
+        (subsys, motor) -> {
+            motor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
             
-    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             motor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
-    //         }, subsys));
-    //     }
-    // );
+            subsys.setDefaultCommand(Commands.runOnce(() -> {
+                motor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
+            }, subsys));
+        }
+    );
 
     // GetPositionSubsys getPositionWristSubsys = new GetPositionSubsys(
     //     "Wrist",
@@ -80,8 +80,8 @@ public class RobotContainer {
                 motor.set(MathUtil.applyDeadband(driver.getLeftX(), 0.1));
             }, subsys));
 
-            driver.b().onTrue(subsys.setSpeed(1)).onFalse(subsys.setSpeed(0));
-            driver.x().onTrue(subsys.setSpeed(-1)).onFalse(subsys.setSpeed(0));
+            // driver.b().onTrue(subsys.setSpeed(1)).onFalse(subsys.setSpeed(0));
+            // driver.x().onTrue(subsys.setSpeed(-1)).onFalse(subsys.setSpeed(0));
         }
     );
 
