@@ -9,8 +9,10 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,13 +39,51 @@ public class RobotContainer {
     // private final BallIntakeSubsys ballIntakeSubsys = new BallIntakeSubsys();
     // private final WristSubsys wristSubsys = new WristSubsys();
 
-    private final GetPositionSubsys getPositionElevatorSubsys = new GetPositionSubsys(12, 13);
-
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandX3DController operator = new CommandX3DController(1);
 
     private final SendableChooser<Command> autoChooser;
 
+    // GetPositionSubsys getPositionElevatorSubsys = new GetPositionSubsys(
+    //     "Elevator",
+    //     12,
+    //     13,
+    //     false,
+    //     (subsys, motor) -> {
+    //         motor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
+            
+    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+    //             motor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
+    //         }, subsys));
+    //     }
+    // );
+
+    // GetPositionSubsys getPositionWristSubsys = new GetPositionSubsys(
+    //     "Wrist",
+    //     8,
+    //     9,
+    //     true,
+    //     (subsys, motor) -> {
+    //         motor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
+    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+    //             motor.set(MathUtil.applyDeadband(driver.getLeftX(), 0.1));
+    //         }, subsys));
+    //     }
+    // );
+
+    GetPositionSubsys getPositionWristSubsys = new GetPositionSubsys(
+        "BallIntake",
+        10,
+        (subsys, motor) -> {
+            motor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
+            subsys.setDefaultCommand(Commands.runOnce(() -> {
+                motor.set(MathUtil.applyDeadband(driver.getLeftX(), 0.1));
+            }, subsys));
+
+            driver.b().onTrue(subsys.setSpeed(1)).onFalse(subsys.setSpeed(0));
+            driver.x().onTrue(subsys.setSpeed(-1)).onFalse(subsys.setSpeed(0));
+        }
+    );
 
 
     /* ----------------- Generated Stuff ----------------- */
@@ -119,10 +159,6 @@ public class RobotContainer {
         // // driver.x().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(180), wristSubsys));
         // // driver.a().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(270), wristSubsys));
         // // wristSubsys.setDefaultCommand(Commands.runOnce(() -> wristSubsys.wristMotor.set(driver.getLeftX()), wristSubsys));
-
-        
-        getPositionElevatorSubsys.setDefaultCommand(Commands.runOnce(() -> getPositionElevatorSubsys.motor.set(driver.getLeftX()), getPositionElevatorSubsys));
-        getPositionElevatorSubsys.motor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
     }
 
     public Command getAutonomousCommand() {

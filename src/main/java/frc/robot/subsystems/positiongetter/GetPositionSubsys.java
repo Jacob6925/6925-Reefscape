@@ -4,34 +4,44 @@
 
 package frc.robot.subsystems.positiongetter;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import java.util.function.BiConsumer;
+
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class GetPositionSubsys extends SubsystemBase {
+  private final String id;
   public final TalonFX motor;
   private final TalonFX motor2;
 
-  public GetPositionSubsys(int deviceId0, int deviceId1) {
-    motor = new TalonFX(deviceId0);
-    motor2 = new TalonFX(deviceId1);
-    motor2.setControl(new Follower(deviceId0, false));
+  public GetPositionSubsys(String id, int id0, int id1, boolean oppositeFollowerDirection, BiConsumer<GetPositionSubsys, TalonFX> settings) {
+    motor = new TalonFX(id0);
+    motor2 = new TalonFX(id1);
+    motor2.setControl(new Follower(motor.getDeviceID(), oppositeFollowerDirection));
 
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    // config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    settings.accept(this, motor);
+    this.id = id;
+  }
+  public GetPositionSubsys(String id, int id0, BiConsumer<GetPositionSubsys, TalonFX> settings) {
+    motor = new TalonFX(id0);
+    motor2 = null;
+    
+    settings.accept(this, motor);
+    this.id = id;
+  }
 
-    motor.getConfigurator().apply(config);
+  public Command setSpeed(int speed) {
+    return Commands.runOnce(() -> motor.set(speed), this);
   }
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Main Motor Rotations", motor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("Sub-Motor Rotations", motor2.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("(" + id + ") Main Motor Rotations", motor.getPosition().getValueAsDouble());
+    if (motor2 != null) SmartDashboard.putNumber("(" + id + ") Sub-Motor Rotations", motor2.getPosition().getValueAsDouble());
   }
 }
