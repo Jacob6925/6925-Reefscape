@@ -21,7 +21,7 @@ public class IntakeCommand extends Command {
 
   @Override
   public void initialize() {
-    pippeIntakeSubsys.setSpeedOfPipeIntake(speed);
+    pippeIntakeSubsys.setSpeed(speed);
   }
 
   @Override
@@ -29,7 +29,7 @@ public class IntakeCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    pippeIntakeSubsys.setSpeedOfPipeIntake(PipeIntakeSpeed.OFF);
+    pippeIntakeSubsys.setSpeed(PipeIntakeSpeed.OFF);
   }
 
   @Override

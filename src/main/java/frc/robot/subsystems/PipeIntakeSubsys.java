@@ -8,6 +8,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.subsystems.BallIntakeSubsys.BallIntakeSpeed;
 
 public class PipeIntakeSubsys extends SubsystemBase {
 	private final TalonFX pipeIntake = new TalonFX(11);
@@ -16,7 +17,11 @@ public class PipeIntakeSubsys extends SubsystemBase {
 		pipeIntake.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
 	}
 
-	public void setSpeedOfPipeIntake(PipeIntakeSpeed speed) {
+	public void setSpeed(PipeIntakeSpeed speed) {
+		pipeIntake.set(speed.value);
+	}
+
+	public void setSpeedFromBallSpeed(BallIntakeSpeed speed) {
 		pipeIntake.set(speed.value);
 	}
 	

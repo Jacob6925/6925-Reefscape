@@ -8,6 +8,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -17,20 +18,27 @@ import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 
 public class ElevatorSubsys extends SubsystemBase {
-  private final TalonFX elevatorMotor = new TalonFX(25);
-  private final TalonFX secondElevatorMotor = new TalonFX(26);
+  private final TalonFX elevatorMotor = new TalonFX(12);
+  private final TalonFX secondElevatorMotor = new TalonFX(13);
 
   private final ProfiledPIDController pidController;
+  private final ElevatorFeedforward feedforward;
 
   public ElevatorSubsys() {
     elevatorMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
-    secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), true));
+    secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), false));
 
     pidController = new ProfiledPIDController(
       ElevatorConstants.kP,
       ElevatorConstants.kI,
       ElevatorConstants.kD,
       new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCEL)
+    );
+
+    feedforward = new ElevatorFeedforward(
+      ElevatorConstants.kS,
+      ElevatorConstants.kG,
+      ElevatorConstants.kV
     );
   }
 
