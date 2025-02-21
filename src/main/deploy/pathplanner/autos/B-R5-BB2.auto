@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": " B-R5"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R5-BB2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GetBall"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
