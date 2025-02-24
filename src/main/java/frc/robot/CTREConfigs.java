@@ -5,6 +5,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class CTREConfigs {
@@ -16,13 +17,12 @@ public class CTREConfigs {
     public CTREConfigs() {
         // Elevator Config
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 25;
+        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 22;//25;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
         ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
-
         ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
         ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
 
