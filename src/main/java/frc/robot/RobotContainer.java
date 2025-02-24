@@ -6,11 +6,13 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -26,8 +28,9 @@ import frc.robot.subsystems.BallIntakeSubsys;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsys;
 import frc.robot.subsystems.WristSubsys;
-import frc.robot.subsystems.positiongetter.GetPositionSubsys;
+import frc.lib.util.GetPositionSubsys;
 import frc.robot.subsystems.BallIntakeSubsys.BallIntakeSpeed;
+import frc.robot.subsystems.ElevatorSubsys.ElevatorPosition;
 import frc.robot.subsystems.PipeIntakeSubsys.PipeIntakeSpeed;
 import frc.robot.subsystems.PipeIntakeSubsys;
 
@@ -43,21 +46,25 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser;
 
-    GetPositionSubsys elevatorTesting = new GetPositionSubsys(
-        "Elevator",
-        12,
-        13,
-        false,
-        (subsys, motor) -> {
-            motor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
+    // GetPositionSubsys elevatorTesting = new GetPositionSubsys(
+    //     "Elevator",
+    //     12,
+    //     13,
+    //     false,
+    //     (subsys) -> {
+    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
+    //         subsys.subMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
             
-            subsys.setDefaultCommand(Commands.runOnce(() -> {
-                motor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
+    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+    //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getLeftY(), 0.1));
 
-                SmartDashboard.putNumber("Elevator motor Voltage", motor.getMotorVoltage().getValueAsDouble());
-            }, subsys));
-        }
-    );
+    //             subsys.maxes.checkMaxVel(subsys.mainMotor.getVelocity().getValueAsDouble());
+    //             SmartDashboard.putNumber("EMaxVel", subsys.maxes.getMaxVel());
+
+    //             // SmartDashboard.putNumber("Elevator motor Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
+    //         }, subsys));
+    //     }
+    // );
 
     // GetPositionSubsys wristTesting = new GetPositionSubsys(
     //     "Wrist",
@@ -121,6 +128,8 @@ public class RobotContainer {
 
         registerNamedCommands();
         configureBindings();
+
+        CameraServer.startAutomaticCapture();
     }
 
     private void registerNamedCommands() {
@@ -169,6 +178,9 @@ public class RobotContainer {
         // // driver.x().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(180), wristSubsys));
         // // driver.a().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(270), wristSubsys));
         // // wristSubsys.setDefaultCommand(Commands.runOnce(() -> wristSubsys.wristMotor.set(driver.getLeftX()), wristSubsys));
+
+        driver.y().onTrue(elevatorSubsys.goTo(ElevatorPosition.HALF_HEIGHT));
+        driver.a().onTrue(elevatorSubsys.goTo(ElevatorPosition.THREE_ROT));
     }
 
     public Command getAutonomousCommand() {

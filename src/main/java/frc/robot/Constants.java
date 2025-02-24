@@ -31,16 +31,20 @@ public final class Constants {
   
   public static final class ElevatorConstants {
     // Trapezoidal Profile Variables
-    public static final double kP = 0.0;
+    public static final double kP = 1.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double MAX_VELOCITY = 0.0;
     public static final double MAX_ACCEL = 0.0;
 
     // FeedForward
-    public static final double kS = 0.0;
-    public static final double kG = 0.0;
-    public static final double kV = 0.0;
+    // public static final double kS = 0.235;
+    // public static final double kG = 0.575;
+    // public static final double kV = 11.65;
+    // works, but motor yells
+    public static final double kS = 0.235;
+    public static final double kG = 0.575;
+    public static final double kV = 11.65;
 
     // Height Setpoints (meters)
     public static final double HEIGHT_OF_INTAKE = 0.0;
