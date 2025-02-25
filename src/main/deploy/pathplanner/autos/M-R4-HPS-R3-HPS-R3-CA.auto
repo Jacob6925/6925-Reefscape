@@ -1,0 +1,115 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M-R4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R4-HPS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PickPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HPS-R3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R3-HPS"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PickPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HPS-R3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R3-CA"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "CageHang"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

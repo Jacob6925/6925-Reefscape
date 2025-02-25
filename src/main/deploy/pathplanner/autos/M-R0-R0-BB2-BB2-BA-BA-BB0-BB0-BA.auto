@@ -1,0 +1,79 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M-R0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Wait"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R0-BB2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GetBall"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": " BB2-BA"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ThrowBall"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": " BA-BB0"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GetBall"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BB0-BA"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ThrowBall"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
