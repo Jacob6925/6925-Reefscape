@@ -7,11 +7,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -78,11 +76,6 @@ public class ElevatorSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if (!DriverStation.isEnabled()) {
-    //   elevatorMotor.set(0);
-    //   return;
-    // }
-
     double elevatorPosition = elevatorMotor.getPosition().getValueAsDouble();
     if (pidControllerUp.getGoal() != null) {
       pidOutput = pidControllerUp.calculate(elevatorPosition);
