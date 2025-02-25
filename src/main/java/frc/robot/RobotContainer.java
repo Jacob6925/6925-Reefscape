@@ -14,6 +14,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -54,14 +55,26 @@ public class RobotContainer {
     //     (subsys) -> {
     //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
     //         subsys.subMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
+
+    //         ElevatorFeedforward ff = new ElevatorFeedforward(Constants.ElevatorConstants.kS, Constants.ElevatorConstants.kG, Constants.ElevatorConstants.kV);
             
+    //         subsys.maxes.reset();
     //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getLeftY(), 0.1));
+    //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
+    //             // if (input != 0) {
+    //             //     subsys.mainMotor.set(input);
+    //             // } else {
+    //             //     subsys.mainMotor.setVoltage(ff.calculate(0));
+    //             // }
+    //             double v = 1;
+    //             subsys.mainMotor.set(MathUtil.clamp(input, -v, v));
 
-    //             subsys.maxes.checkMaxVel(subsys.mainMotor.getVelocity().getValueAsDouble());
+    //             subsys.maxes.checkMaxVel(-subsys.mainMotor.getVelocity().getValueAsDouble());
+    //             subsys.maxes.checkMaxAccel(-subsys.mainMotor.getAcceleration().getValueAsDouble());
     //             SmartDashboard.putNumber("EMaxVel", subsys.maxes.getMaxVel());
+    //             SmartDashboard.putNumber("EMaxAccel", subsys.maxes.getMaxAccel());
 
-    //             // SmartDashboard.putNumber("Elevator motor Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
+    //             SmartDashboard.putNumber("Elevator motor Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
     //         }, subsys));
     //     }
     // );
@@ -71,10 +84,12 @@ public class RobotContainer {
     //     8,
     //     9,
     //     true,
-    //     (subsys, motor) -> {
-    //         motor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
+    //     (subsys) -> {
+    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
     //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             motor.set(MathUtil.applyDeadband(driver.getLeftX(), 0.1));
+    //             SmartDashboard.putNumber("WristPos", subsys.mainMotor.getPosition().getValueAsDouble());
+    //             SmartDashboard.putNumber("WristPos2", subsys.subMotor.getPosition().getValueAsDouble());
+    //             // subsys.mainMotor.set(MathUtil.applyDeadband(driver.getLeftX(), 0.1));
     //         }, subsys));
     //     }
     // );
@@ -93,11 +108,13 @@ public class RobotContainer {
     // GetPositionSubsys pipeIntakeTesting = new GetPositionSubsys(
     //     "PipeIntake",
     //     11,
-    //     (subsys, motor) -> {
-    //         motor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
+    //     10,
+    //     false,
+    //     (subsys) -> {
+    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
             
     //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             motor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
+    //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
     //         }, subsys));
     //     }
     // );
@@ -143,35 +160,7 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        // // Note that X is defined as forward according to WPILib convention,
-        // // and Y is defined as to the left according to WPILib convention.
-        // drivetrain.setDefaultCommand(
-        //     // Drivetrain will execute this command periodically
-        //     drivetrain.applyRequest(() ->
-        //         drive.withVelocityX(-driver.getLeftY() * MaxSpeed * drivetrain.getCurrentSpeedMulti()) // Drive forward with negative Y (forward)
-        //             .withVelocityY(-driver.getLeftX() * MaxSpeed * drivetrain.getCurrentSpeedMulti()) // Drive left with negative X (left)
-        //             .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-        //     )
-        // );
-
-        // driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        // driver.b().whileTrue(drivetrain.applyRequest(() ->
-        //     point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
-        // ));
-
-        // // Run SysId routines when holding back/start and X/Y.
-        // // Note that each routine should be run exactly once in a single log.
-        // driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        // // reset the field-centric heading on left bumper press
-        // driver.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
-        // drivetrain.registerTelemetry(logger::telemeterize);
-
-        // driver.leftBumper().onChange(new InstantCommand(() -> drivetrain.toggleHalfSpeed()));
+        // configureSwerveButtons();
 
         // // driver.b().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(0), wristSubsys));
         // // driver.y().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(90), wristSubsys));
@@ -179,8 +168,40 @@ public class RobotContainer {
         // // driver.a().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(270), wristSubsys));
         // // wristSubsys.setDefaultCommand(Commands.runOnce(() -> wristSubsys.wristMotor.set(driver.getLeftX()), wristSubsys));
 
-        driver.y().onTrue(elevatorSubsys.goTo(ElevatorPosition.HALF_HEIGHT));
-        driver.a().onTrue(elevatorSubsys.goTo(ElevatorPosition.THREE_ROT));
+        // driver.y().onTrue(elevatorSubsys.goTo(ElevatorPosition.MAX_HEIGHT));
+        // driver.a().onTrue(elevatorSubsys.goTo(ElevatorPosition.QUARTER_HEIGHT));
+    }
+
+    private void configureSwerveButtons() {        
+        // Note that X is defined as forward according to WPILib convention,
+        // and Y is defined as to the left according to WPILib convention.
+        drivetrain.setDefaultCommand(
+            // Drivetrain will execute this command periodically
+            drivetrain.applyRequest(() ->
+                drive.withVelocityX(-driver.getLeftY() * MaxSpeed * drivetrain.getCurrentSpeedMulti()) // Drive forward with negative Y (forward)
+                    .withVelocityY(-driver.getLeftX() * MaxSpeed * drivetrain.getCurrentSpeedMulti()) // Drive left with negative X (left)
+                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+            )
+        );
+
+        driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        driver.b().whileTrue(drivetrain.applyRequest(() ->
+            point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
+        ));
+
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        driver.back().and(driver.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        // reset the field-centric heading on left bumper press
+        driver.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
+        drivetrain.registerTelemetry(logger::telemeterize);
+
+        driver.leftBumper().onChange(new InstantCommand(() -> drivetrain.toggleHalfSpeed()));
     }
 
     public Command getAutonomousCommand() {

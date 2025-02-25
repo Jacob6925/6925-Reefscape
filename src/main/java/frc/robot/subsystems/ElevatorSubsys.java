@@ -27,18 +27,26 @@ public class ElevatorSubsys extends SubsystemBase {
 
   MaxFinder maxes = new MaxFinder();
 
-  private final ProfiledPIDController pidController;
+  private final ProfiledPIDController pidControllerUp;
+  private final ProfiledPIDController pidControllerDown;
   private final ElevatorFeedforward feedforward;
 
   public ElevatorSubsys() {
     elevatorMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
     secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), false));
 
-    pidController = new ProfiledPIDController(
-      ElevatorConstants.kP,
-      ElevatorConstants.kI,
-      ElevatorConstants.kD,
-      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCEL)
+    pidControllerUp = new ProfiledPIDController(
+      ElevatorConstants.kP_Up,
+      ElevatorConstants.kI_Up,
+      ElevatorConstants.kD_Up,
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_UP, ElevatorConstants.MAX_ACCEL_UP)
+    );
+
+    pidControllerDown = new ProfiledPIDController(
+      ElevatorConstants.kP_Down,
+      ElevatorConstants.kI_Down,
+      ElevatorConstants.kD_Down,
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_DOWN, ElevatorConstants.MAX_ACCEL_DOWN)
     );
 
     feedforward = new ElevatorFeedforward(
@@ -47,34 +55,49 @@ public class ElevatorSubsys extends SubsystemBase {
       ElevatorConstants.kV
     );
 
-    pidController.reset(0);
+    pidControllerUp.reset(0);
+    pidControllerDown.reset(0);
   }
 
   public Command goTo(ElevatorPosition setpoint) {
-    return Commands.runOnce(() -> pidController.setGoal(setpoint.rotations), this);
+    return Commands.runOnce(() -> {
+      if (setpoint.rotations > elevatorMotor.getPosition().getValueAsDouble()) {
+        // need to go up
+        pidControllerUp.setGoal(setpoint.rotations);
+        pidControllerDown.setGoal(null);
+      } else {
+        // need to go down
+        pidControllerUp.setGoal(null);
+        pidControllerDown.setGoal(setpoint.rotations);
+      }
+    });
   }
 
-  private double pidOutput = -999;
-  private double feedForwardOutput = -999;
+  private double pidOutput = 0;
+  private double feedForwardOutput = 0;
 
   @Override
   public void periodic() {
-    if (!DriverStation.isEnabled()) {
-      elevatorMotor.set(0);
-      return;
-    }
+    // if (!DriverStation.isEnabled()) {
+    //   elevatorMotor.set(0);
+    //   return;
+    // }
 
-    pidOutput = pidController.calculate(elevatorMotor.getPosition().getValueAsDouble());
-    if (pidOutput < 0) {
-      feedForwardOutput = feedforward.calculate(pidController.getSetpoint().velocity);
+    double elevatorPosition = elevatorMotor.getPosition().getValueAsDouble();
+    if (pidControllerUp.getGoal() != null) {
+      pidOutput = pidControllerUp.calculate(elevatorPosition);
+      feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
+      SmartDashboard.putString("CurrPID", "Up");
+    } else if (pidControllerDown.getGoal() != null) {
+      pidOutput = pidControllerDown.calculate(elevatorPosition);
+      feedForwardOutput = feedforward.calculate(pidControllerDown.getSetpoint().velocity);
+      SmartDashboard.putString("CurrPID", "Down");
     } else {
-      feedForwardOutput = 0;
+      pidOutput = 0;
+      feedForwardOutput = feedforward.calculate(0);
     }
-    elevatorMotor.setVoltage(pidOutput + feedForwardOutput);
 
-    // double out = pidController.calculate(elevatorMotor.getPosition().getValueAsDouble());
-    // out = MathUtil.clamp(out, -1, 1);
-    // elevatorMotor.set(out);
+    elevatorMotor.setVoltage(pidOutput + feedForwardOutput);
 
     SmartDashboard.putNumber("PID Output", pidOutput);
     SmartDashboard.putNumber("FF Output", feedForwardOutput);
@@ -84,10 +107,11 @@ public class ElevatorSubsys extends SubsystemBase {
   }
 
   public enum ElevatorPosition {
-    MAX_HEIGHT(ElevatorConstants.MAX_HEIGHT),
-    HALF_HEIGHT(25/2.0),
+    MAX_HEIGHT(Constants.Configs.ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold),
+    HALF_HEIGHT(Constants.Configs.ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold/2.0),
+    QUARTER_HEIGHT(Constants.Configs.ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold/4.0),
     THREE_ROT(3),
-    MIN_HEIGHT(0.0);
+    MIN_HEIGHT(0);
 
     public final double rotations;
     private ElevatorPosition(double rotations) {
