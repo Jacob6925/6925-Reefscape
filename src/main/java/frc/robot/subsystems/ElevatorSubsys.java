@@ -76,6 +76,9 @@ public class ElevatorSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("EPos0", elevatorMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("EPos1", secondElevatorMotor.getPosition().getValueAsDouble());
+
     double elevatorPosition = elevatorMotor.getPosition().getValueAsDouble();
     if (pidControllerUp.getGoal() != null) {
       pidOutput = pidControllerUp.calculate(elevatorPosition);

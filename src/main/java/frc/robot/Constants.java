@@ -37,19 +37,15 @@ public final class Constants {
     public static final double MAX_VELOCITY_UP = 33.49609375; //max vel=33.49609375 rot/sec
     public static final double MAX_ACCEL_UP = 165.5; //max accel=165.5 rot/sec^2
 
-    public static final double kP_Down = 0.25;
+    public static final double kP_Down = 0.3;
     public static final double kI_Down = 0.0;
-    public static final double kD_Down = 0.01;
-    public static final double MAX_VELOCITY_DOWN = 0; //max vel=-X rot/sec
-    public static final double MAX_ACCEL_DOWN = 0; //max accel=-X rot/sec^2
+    public static final double kD_Down = 0.015;//25;
+    public static final double MAX_VELOCITY_DOWN = 33.3671875; //max vel=-33.3671875 rot/sec
+    public static final double MAX_ACCEL_DOWN = 202.5; //max accel=-202.5 rot/sec^2
 
     // FeedForward
-    // public static final double kS = 0.235;
-    // public static final double kG = 0.575;
-    // public static final double kV = 11.65;
-    // works, but motor yells
     public static final double kS = 0.235;
-    public static final double kG = 0.575;
+    public static final double kG = 0.81; //.575//.81v max
     public static final double kV = 11.65;
   }
 
@@ -60,6 +56,11 @@ public final class Constants {
     public static final double kD = 0.0;
     public static final double MAX_VELOCITY = 0.0;
     public static final double MAX_ACCEL = 0.0;
+
+    // FeedForward values
+    public static final double kS = 0.235;
+    public static final double kG = 0.81;
+    public static final double kV = 11.65;
 
     // Setpoints (rotations)
     public static final double MAX_HEIGHT = 0.0;

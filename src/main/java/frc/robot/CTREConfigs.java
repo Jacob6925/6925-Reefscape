@@ -16,7 +16,7 @@ public class CTREConfigs {
     public CTREConfigs() {
         // Elevator Config
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 22;//25;
+        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 25;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
