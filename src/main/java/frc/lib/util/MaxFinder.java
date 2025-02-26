@@ -24,4 +24,9 @@ public class MaxFinder {
     public double getMaxAccel() {
         return maxAccel;
     }
+
+    public void reset() {
+        maxAccel = 0;
+        maxVel = 0;
+    }
 }
