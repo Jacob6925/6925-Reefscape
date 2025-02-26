@@ -1,0 +1,103 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "M-R2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R2-HPST"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PickPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HPST-R2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe2"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "R2-HPST"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "PickPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HPST-R1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
