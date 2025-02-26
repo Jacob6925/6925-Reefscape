@@ -21,9 +21,9 @@ public class CTREConfigs {
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
-        ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        // ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
         ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
-        ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
+        // ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
 
         // Ball Intake Config
         BALL_INTAKE_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;

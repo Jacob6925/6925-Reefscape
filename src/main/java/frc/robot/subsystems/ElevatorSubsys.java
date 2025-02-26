@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.util.MaxFinder;
 //import edu.wpi.first.wpilibj2.command.TrapezoidProfileSubsystem;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
@@ -23,8 +22,6 @@ public class ElevatorSubsys extends SubsystemBase {
   private final TalonFX elevatorMotor = new TalonFX(12);
   private final TalonFX secondElevatorMotor = new TalonFX(13);
 
-  MaxFinder maxes = new MaxFinder();
-
   private final ProfiledPIDController pidController;
   private final ElevatorFeedforward feedforward;
 
@@ -32,13 +29,15 @@ public class ElevatorSubsys extends SubsystemBase {
     elevatorMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
     secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), false));
 
-    // pidController = new ProfiledPIDController(
-    //   ElevatorConstants.kP_Up,
-    //   ElevatorConstants.kI_Up,
-    //   ElevatorConstants.kD_Up,
-    //   new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_UP, ElevatorConstants.MAX_ACCEL_UP)
+    pidController = new ProfiledPIDController(
+      ElevatorConstants.kP_Up,
+      ElevatorConstants.kI_Up,
+      ElevatorConstants.kD_Up,
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_UP, ElevatorConstants.MAX_ACCEL_UP)
+    );
+    // pidController = new ProfiledPIDController(0,0,0,
+    //   new TrapezoidProfile.Constraints(Constants.ElevatorConstants.MAX_VELOCITY_UP, Constants.ElevatorConstants.MAX_ACCEL_UP)
     // );
-    pidController = new ProfiledPIDController(0,0,0,new TrapezoidProfile.Constraints(0,0));
 
     feedforward = new ElevatorFeedforward(
       ElevatorConstants.kS,
@@ -84,9 +83,6 @@ public class ElevatorSubsys extends SubsystemBase {
 
     SmartDashboard.putNumber("PID Output", pidOutput);
     SmartDashboard.putNumber("FF Output", feedForwardOutput);
-
-    maxes.checkMaxVel(elevatorMotor.getVelocity().getValueAsDouble());
-    SmartDashboard.putNumber("Elev Max Vel", maxes.getMaxVel());
   }
 
   public enum ElevatorPosition {
