@@ -60,14 +60,14 @@ public class RobotContainer {
             
     //         subsys.maxes.reset();
     //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             // double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
-    //             // if (input != 0) {
-    //             //     double maxVelocity = 0.5;
-    //             //     subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
-    //             // } else {
-    //             //     subsys.mainMotor.setVoltage(ff.calculate(0));
-    //             // }
-    //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
+    //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
+    //             if (input != 0) {
+    //                 double maxVelocity = 0.5;
+    //                 subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
+    //             } else {
+    //                 subsys.mainMotor.setVoltage(ff.calculate(0));
+    //             }
+    //             // subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
 
     //             subsys.maxes.checkMaxVel(-subsys.mainMotor.getVelocity().getValueAsDouble());
     //             subsys.maxes.checkMaxAccel(-subsys.mainMotor.getAcceleration().getValueAsDouble());
@@ -168,8 +168,8 @@ public class RobotContainer {
         // // driver.a().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(270), wristSubsys));
         // // wristSubsys.setDefaultCommand(Commands.runOnce(() -> wristSubsys.wristMotor.set(driver.getLeftX()), wristSubsys));
 
-        driver.y().onTrue(elevatorSubsys.goTo(ElevatorPosition.MAX_HEIGHT));
-        driver.a().onTrue(elevatorSubsys.goTo(ElevatorPosition.QUARTER_HEIGHT));
+        // driver.y().onTrue(elevatorSubsys.goTo(ElevatorPosition.MAX_HEIGHT));
+        // driver.a().onTrue(elevatorSubsys.goTo(ElevatorPosition.QUARTER_HEIGHT));
     }
 
     private void configureSwerveButtons() {        

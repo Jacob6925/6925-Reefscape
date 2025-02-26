@@ -25,27 +25,20 @@ public class ElevatorSubsys extends SubsystemBase {
 
   MaxFinder maxes = new MaxFinder();
 
-  private final ProfiledPIDController pidControllerUp;
-  private final ProfiledPIDController pidControllerDown;
+  private final ProfiledPIDController pidController;
   private final ElevatorFeedforward feedforward;
 
   public ElevatorSubsys() {
     elevatorMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
     secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), false));
 
-    pidControllerUp = new ProfiledPIDController(
-      ElevatorConstants.kP_Up,
-      ElevatorConstants.kI_Up,
-      ElevatorConstants.kD_Up,
-      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_UP, ElevatorConstants.MAX_ACCEL_UP)
-    );
-
-    pidControllerDown = new ProfiledPIDController(
-      ElevatorConstants.kP_Down,
-      ElevatorConstants.kI_Down,
-      ElevatorConstants.kD_Down,
-      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_DOWN, ElevatorConstants.MAX_ACCEL_DOWN)
-    );
+    // pidController = new ProfiledPIDController(
+    //   ElevatorConstants.kP_Up,
+    //   ElevatorConstants.kI_Up,
+    //   ElevatorConstants.kD_Up,
+    //   new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_UP, ElevatorConstants.MAX_ACCEL_UP)
+    // );
+    pidController = new ProfiledPIDController(0,0,0,new TrapezoidProfile.Constraints(0,0));
 
     feedforward = new ElevatorFeedforward(
       ElevatorConstants.kS,
@@ -53,21 +46,12 @@ public class ElevatorSubsys extends SubsystemBase {
       ElevatorConstants.kV
     );
 
-    pidControllerUp.reset(0);
-    pidControllerDown.reset(0);
+    pidController.reset(0);
   }
 
   public Command goTo(ElevatorPosition setpoint) {
     return Commands.runOnce(() -> {
-      if (setpoint.rotations > elevatorMotor.getPosition().getValueAsDouble()) {
-        // need to go up
-        pidControllerUp.setGoal(setpoint.rotations);
-        pidControllerDown.setGoal(null);
-      } else {
-        // need to go down
-        pidControllerUp.setGoal(null);
-        pidControllerDown.setGoal(setpoint.rotations);
-      }
+      pidController.setGoal(setpoint.rotations);
     });
   }
 
@@ -79,20 +63,23 @@ public class ElevatorSubsys extends SubsystemBase {
     SmartDashboard.putNumber("EPos0", elevatorMotor.getPosition().getValueAsDouble());
     SmartDashboard.putNumber("EPos1", secondElevatorMotor.getPosition().getValueAsDouble());
 
-    double elevatorPosition = elevatorMotor.getPosition().getValueAsDouble();
-    if (pidControllerUp.getGoal() != null) {
-      pidOutput = pidControllerUp.calculate(elevatorPosition);
-      feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
-      SmartDashboard.putString("CurrPID", "Up");
-    } else if (pidControllerDown.getGoal() != null) {
-      pidOutput = pidControllerDown.calculate(elevatorPosition);
-      feedForwardOutput = feedforward.calculate(pidControllerDown.getSetpoint().velocity);
-      SmartDashboard.putString("CurrPID", "Down");
-    } else {
-      pidOutput = 0;
-      feedForwardOutput = feedforward.calculate(0);
-    }
+    // double elevatorPosition = elevatorMotor.getPosition().getValueAsDouble();
+    // if (pidControllerUp.getGoal() != null) {
+    //   pidOutput = pidControllerUp.calculate(elevatorPosition);
+    //   feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
+    //   SmartDashboard.putString("CurrPID", "Up");
+    // } else if (pidControllerDown.getGoal() != null) {
+    //   pidOutput = pidControllerDown.calculate(elevatorPosition);
+    //   feedForwardOutput = feedforward.calculate(pidControllerDown.getSetpoint().velocity);
+    //   SmartDashboard.putString("CurrPID", "Down");
+    // } else {
+    //   pidOutput = 0;
+    //   feedForwardOutput = feedforward.calculate(0);
+    // }
 
+    pidOutput = pidController.calculate(elevatorMotor.getPosition().getValueAsDouble());
+    // feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
+    feedForwardOutput = 0;
     elevatorMotor.setVoltage(pidOutput + feedForwardOutput);
 
     SmartDashboard.putNumber("PID Output", pidOutput);

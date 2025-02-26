@@ -45,7 +45,7 @@ public final class Constants {
 
     // FeedForward
     public static final double kS = 0.235;
-    public static final double kG = 0.81; //.575//.81v max
+    public static final double kG = 0.575;//.81v max
     public static final double kV = 11.65;
   }
 
@@ -58,9 +58,9 @@ public final class Constants {
     public static final double MAX_ACCEL = 0.0;
 
     // FeedForward values
-    public static final double kS = 0.235;
-    public static final double kG = 0.81;
-    public static final double kV = 11.65;
+    public static final double kS = 0;
+    public static final double kG = 0;
+    public static final double kV = 0;
 
     // Setpoints (rotations)
     public static final double MAX_HEIGHT = 0.0;
