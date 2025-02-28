@@ -19,22 +19,25 @@ public class GetPositionSubsys extends SubsystemBase {
   public final TalonFX mainMotor;
   public final TalonFX subMotor;
 
-  public final MaxFinder maxes = new MaxFinder();
+  public final MaxCollections maxes;
 
   public GetPositionSubsys(String id, int id0, int id1, boolean oppositeFollowerDirection, Consumer<GetPositionSubsys> settings) {
     mainMotor = new TalonFX(id0);
-    subMotor = new TalonFX(id1);
-    subMotor.setControl(new Follower(mainMotor.getDeviceID(), oppositeFollowerDirection));
+    if (id1 >= 0) {
+      subMotor = new TalonFX(id1);
+      subMotor.setControl(new Follower(mainMotor.getDeviceID(), oppositeFollowerDirection));
+    } else {
+      subMotor = null;
+    }
 
-    settings.accept(this);
     this.id = id;
-  }
-  public GetPositionSubsys(String id, int id0, Consumer<GetPositionSubsys> settings) {
-    mainMotor = new TalonFX(id0);
-    subMotor = null;
+    this.maxes = new MaxCollections(id, () -> mainMotor.getVelocity().getValueAsDouble(), () -> mainMotor.getAcceleration().getValueAsDouble());
     
     settings.accept(this);
-    this.id = id;
+  }
+
+  public GetPositionSubsys(String id, int id0, Consumer<GetPositionSubsys> settings) {
+    this(id, id0, -1, false, settings);
   }
 
   public Command setSpeed(int speed) {

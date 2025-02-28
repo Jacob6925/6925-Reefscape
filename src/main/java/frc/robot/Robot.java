@@ -7,14 +7,21 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ElevatorSubsys;
 
 public class Robot extends TimedRobot {
+  private static Robot instance;
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
 
   public Robot() {
     m_robotContainer = new RobotContainer();
+    instance = this;
+  }
+
+  public static Robot getInstance() {
+    return instance;
   }
 
   @Override
@@ -57,7 +64,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    ElevatorSubsys instance = ElevatorSubsys.getInstance();
+    if (instance != null) ElevatorSubsys.getInstance().resetElevatorSetpoint();
+  }
 
   @Override
   public void testInit() {

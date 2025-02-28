@@ -7,10 +7,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -20,6 +19,7 @@ public class WristSubsys extends SubsystemBase {
   private final TalonFX wristFollowerMotor = new TalonFX(9);
 
   private final ProfiledPIDController pidController;
+  private final ArmFeedforward feedForward;
 
   public WristSubsys() {
     wristMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
@@ -31,29 +31,37 @@ public class WristSubsys extends SubsystemBase {
       Constants.WristConstants.kD,
       new TrapezoidProfile.Constraints(Constants.WristConstants.MAX_VELOCITY, Constants.WristConstants.MAX_ACCEL)
     );
+
+    feedForward = new ArmFeedforward(
+      Constants.WristConstants.kS,
+      Constants.WristConstants.kG,
+      Constants.WristConstants.kV
+    );
   }
 
   public void goTo(IntakePivotSetpoint setpoint) {
     pidController.setGoal(setpoint.rotations);
   }
 
+  private double pidOutput = 0;
+  private double feedForwardOutput = 0;
+
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("rotations", wristMotor.getPosition().getValueAsDouble());
+    double wristPosition = wristMotor.getPosition().getValueAsDouble();
+    pidOutput = pidController.calculate(wristPosition);
+    feedForwardOutput = feedForward.calculate(wristPosition, pidController.getSetpoint().velocity);
+    
+    wristMotor.setVoltage(pidOutput + feedForwardOutput);
 
-    if (!DriverStation.isEnabled()) {
-      wristMotor.set(0);
-      return;
-    }
-
-    double output = pidController.calculate(wristMotor.getPosition().getValueAsDouble());
-    output = MathUtil.clamp(output, -1, 1);
-    wristMotor.set(output);
+    SmartDashboard.putNumber("PID Output", pidOutput);
+    SmartDashboard.putNumber("FF Output", feedForwardOutput);
   }
 
   public enum IntakePivotSetpoint {
-    MAX_HEIGHT(Constants.WristConstants.MAX_HEIGHT),
-    MIN_HEIGHT(0.0);
+    MAX_POS(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold),
+    START_POS(0.0),
+    MIN_POS(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold);
 
     public final double rotations;
     private IntakePivotSetpoint(double rotations) {

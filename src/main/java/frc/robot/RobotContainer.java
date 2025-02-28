@@ -54,27 +54,21 @@ public class RobotContainer {
     //     false,
     //     (subsys) -> {
     //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
-    //         subsys.subMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
 
     //         ElevatorFeedforward ff = new ElevatorFeedforward(Constants.ElevatorConstants.kS, Constants.ElevatorConstants.kG, Constants.ElevatorConstants.kV);
             
     //         subsys.maxes.reset();
     //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             // double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
-    //             // if (input != 0) {
-    //             //     double maxVelocity = 0.5;
-    //             //     subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
-    //             // } else {
-    //             //     subsys.mainMotor.setVoltage(ff.calculate(0));
-    //             // }
-    //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
+    //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
+    //             if (input != 0) {
+    //                 double maxVelocity = 0.5;
+    //                 subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
+    //             } else {
+    //                 subsys.mainMotor.setVoltage(ff.calculate(0));
+    //             }
+    //             // subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
 
-    //             subsys.maxes.checkMaxVel(-subsys.mainMotor.getVelocity().getValueAsDouble());
-    //             subsys.maxes.checkMaxAccel(-subsys.mainMotor.getAcceleration().getValueAsDouble());
-    //             SmartDashboard.putNumber("EMaxVel", subsys.maxes.getMaxVel());
-    //             SmartDashboard.putNumber("EMaxAccel", subsys.maxes.getMaxAccel());
-
-    //             SmartDashboard.putNumber("Elevator motor Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
+    //             // SmartDashboard.putNumber("Position", subsys.mainMotor.getPosition().getValueAsDouble());
     //         }, subsys));
     //     }
     // );
@@ -87,12 +81,9 @@ public class RobotContainer {
         (subsys) -> {
             subsys.mainMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
             subsys.setDefaultCommand(Commands.runOnce(() -> {
-                // SmartDashboard.putNumber("WristPos", subsys.mainMotor.getPosition().getValueAsDouble());
-                // SmartDashboard.putNumber("WristPos2", subsys.subMotor.getPosition().getValueAsDouble());
+                subsys.mainMotor.set(MathUtil.applyDeadband(-operator.getPitch(), 0.1));
 
-                SmartDashboard.putNumber("WristVolt", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
-                SmartDashboard.putNumber("WristVolt2", subsys.subMotor.getMotorVoltage().getValueAsDouble());
-                subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getRightY(), 0.1));
+                SmartDashboard.putNumber("Wrist Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
             }, subsys));
         }
     );
@@ -100,27 +91,27 @@ public class RobotContainer {
     // GetPositionSubsys ballIntakeTesting = new GetPositionSubsys(
     //     "BallIntake",
     //     10,
-    //     (subsys, motor) -> {
-    //         motor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
+    //     (subsys) -> {
+    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
     //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             motor.set(MathUtil.applyDeadband(driver.getLeftX(), 0.1));
+    //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftX(), 0.1));
     //         }, subsys));
     //     }
     // );
 
-    // GetPositionSubsys pipeIntakeTesting = new GetPositionSubsys(
-    //     "PipeIntake",
-    //     11,
-    //     10,
-    //     false,
-    //     (subsys) -> {
-    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
+    GetPositionSubsys pipeIntakeTesting = new GetPositionSubsys(
+        "PipeIntake",
+        11,
+        10,
+        false,
+        (subsys) -> {
+            subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
             
-    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
-    //         }, subsys));
-    //     }
-    // );
+            subsys.setDefaultCommand(Commands.runOnce(() -> {
+                subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
+            }, subsys));
+        }
+    );
 
 
     /* ----------------- Generated Stuff ----------------- */
@@ -171,8 +162,10 @@ public class RobotContainer {
         // // driver.a().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(270), wristSubsys));
         // // wristSubsys.setDefaultCommand(Commands.runOnce(() -> wristSubsys.wristMotor.set(driver.getLeftX()), wristSubsys));
 
-        driver.y().onTrue(elevatorSubsys.goTo(ElevatorPosition.MAX_HEIGHT));
-        driver.a().onTrue(elevatorSubsys.goTo(ElevatorPosition.QUARTER_HEIGHT));
+        operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1));
+        operator.button(12).onTrue(elevatorSubsys.goTo(ElevatorPosition.L2));
+        operator.button(9).onTrue(elevatorSubsys.goTo(ElevatorPosition.L3));
+        operator.button(10).onTrue(elevatorSubsys.goTo(ElevatorPosition.L4));
     }
 
     private void configureSwerveButtons() {        
