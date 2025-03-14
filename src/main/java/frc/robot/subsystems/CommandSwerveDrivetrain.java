@@ -23,9 +23,11 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.TunerConstants;
@@ -291,6 +293,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        SmartDashboard.putBoolean("Half Speed", speedMulti != 1);
+        SmartDashboard.putNumber("Speed Multi", speedMulti);
     }
 
     private void startSimThread() {
@@ -345,8 +350,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Half Speed */
     private double speedMulti = 1.0;
 
-    public void toggleHalfSpeed() {
-        speedMulti = (speedMulti == 1.0 ? 0.5 : 1.0);
+    public Command toggleHalfSpeed() {
+        return Commands.runOnce(() -> speedMulti = (speedMulti == 1.0 ? 0.5 : 1.0), this);
     }
 
     public double getCurrentSpeedMulti() {
