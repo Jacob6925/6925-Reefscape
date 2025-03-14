@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.BallIntakeSubsys.BallIntakeSpeed;
@@ -21,6 +23,10 @@ public class PipeIntakeSubsys extends SubsystemBase {
 		pipeIntake.set(speed.value);
 	}
 
+	public Command setSpeedCommand(PipeIntakeSpeed speed) {
+		return Commands.runOnce(() -> pipeIntake.set(speed.value), this);
+	}
+
 	public void setSpeedFromBallSpeed(BallIntakeSpeed speed) {
 		pipeIntake.set(speed.value);
 	}
@@ -31,8 +37,9 @@ public class PipeIntakeSubsys extends SubsystemBase {
 
 	public enum PipeIntakeSpeed {
 		OFF(0),
-		INTAKE(0.5),
-		EJECT(-0.5);
+		INTAKE(0.4),
+		EJECT(-0.5),
+		L1_EJECT(-0.25);
 
 		public final double value;
 		PipeIntakeSpeed(double value) {

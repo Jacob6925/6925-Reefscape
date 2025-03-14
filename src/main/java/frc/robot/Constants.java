@@ -31,11 +31,11 @@ public final class Constants {
   
   public static final class ElevatorConstants {
     // Trapezoidal Profile Variables
-    public static final double kP_Up = 1.0;
-    public static final double kI_Up = 0.0;
-    public static final double kD_Up = 0.0;
-    public static final double MAX_VELOCITY_UP = 33.49609375; //max vel=33.49609375 rot/sec
-    public static final double MAX_ACCEL_UP = 165.5; //max accel=165.5 rot/sec^2
+    public static final double kP = 1.0;
+    public static final double kI = 3.0;
+    public static final double kD = 0.0;
+    public static final double MAX_VELOCITY = 33.49609375; //max vel=33.49609375 rot/sec
+    public static final double MAX_ACCEL = 50.5; //max accel=165.5 rot/sec^2
 
     // FeedForward
     public static final double kS = 0.235;
@@ -45,7 +45,7 @@ public final class Constants {
 
   public static final class WristConstants {
     // Trapezoidal Profile Variables
-    public static final double kP = 0.0;
+    public static final double kP = 0.25;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
     public static final double MAX_VELOCITY = 0.0;

@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,10 +34,10 @@ public class ElevatorSubsys extends SubsystemBase {
     secondElevatorMotor.setControl(new Follower(elevatorMotor.getDeviceID(), false));
 
     pidController = new ProfiledPIDController(
-      ElevatorConstants.kP_Up,
-      ElevatorConstants.kI_Up,
-      ElevatorConstants.kD_Up,
-      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY_UP, ElevatorConstants.MAX_ACCEL_UP)
+      ElevatorConstants.kP,
+      ElevatorConstants.kI,
+      ElevatorConstants.kD,
+      new TrapezoidProfile.Constraints(ElevatorConstants.MAX_VELOCITY, ElevatorConstants.MAX_ACCEL)
     );
 
     // feedforward = new ElevatorFeedforward(
@@ -92,7 +93,8 @@ public class ElevatorSubsys extends SubsystemBase {
     L1(1.67822265625),
     L2(4.94384765625),
     L3(12.37548828125),
-    L4(MAX_HEIGHT.rotations);
+    L4(MAX_HEIGHT.rotations),
+    HUMAN_PLAYER_INTAKE(5.2319);
 
     public final double rotations;
     private ElevatorPosition(double rotations) {
@@ -106,5 +108,13 @@ public class ElevatorSubsys extends SubsystemBase {
 
   public void resetElevatorSetpoint() {
     pidController.setGoal(new TrapezoidProfile.State());
+  }
+
+  public double getMotorRotations() {
+    return elevatorMotor.getPosition().getValueAsDouble();
+  }
+
+  public ProfiledPIDController getPIDController() {
+    return pidController;
   }
 }

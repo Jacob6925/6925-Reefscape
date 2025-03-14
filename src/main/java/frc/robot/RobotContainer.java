@@ -16,11 +16,15 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.lib.CommandX3DController;
@@ -33,86 +37,21 @@ import frc.lib.util.GetPositionSubsys;
 import frc.robot.subsystems.BallIntakeSubsys.BallIntakeSpeed;
 import frc.robot.subsystems.ElevatorSubsys.ElevatorPosition;
 import frc.robot.subsystems.PipeIntakeSubsys.PipeIntakeSpeed;
+import frc.robot.subsystems.WristSubsys.WristSetpoint;
 import frc.robot.subsystems.PipeIntakeSubsys;
 
 public class RobotContainer {
     private static RobotContainer instance;
-    private final ElevatorSubsys elevatorSubsys = new ElevatorSubsys();
-    // private final PipeIntakeSubsys pipeIntakeSubsys = new PipeIntakeSubsys();
-    // private final BallIntakeSubsys ballIntakeSubsys = new BallIntakeSubsys();
-    // private final WristSubsys wristSubsys = new WristSubsys();
+
+    private final ElevatorSubsys elevatorSubsys;
+    private final PipeIntakeSubsys pipeIntakeSubsys;
+    private final BallIntakeSubsys ballIntakeSubsys;
+    private final WristSubsys wristSubsys;
 
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandX3DController operator = new CommandX3DController(1);
 
     private final SendableChooser<Command> autoChooser;
-
-    // GetPositionSubsys elevatorTesting = new GetPositionSubsys(
-    //     "Elevator",
-    //     12,
-    //     13,
-    //     false,
-    //     (subsys) -> {
-    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
-
-    //         ElevatorFeedforward ff = new ElevatorFeedforward(Constants.ElevatorConstants.kS, Constants.ElevatorConstants.kG, Constants.ElevatorConstants.kV);
-            
-    //         subsys.maxes.reset();
-    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
-    //             if (input != 0) {
-    //                 double maxVelocity = 0.5;
-    //                 subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
-    //             } else {
-    //                 subsys.mainMotor.setVoltage(ff.calculate(0));
-    //             }
-    //             // subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
-
-    //             // SmartDashboard.putNumber("Position", subsys.mainMotor.getPosition().getValueAsDouble());
-    //         }, subsys));
-    //     }
-    // );
-
-    GetPositionSubsys wristTesting = new GetPositionSubsys(
-        "Wrist",
-        8,
-        9,
-        true,
-        (subsys) -> {
-            subsys.mainMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
-            subsys.setDefaultCommand(Commands.runOnce(() -> {
-                subsys.mainMotor.set(MathUtil.applyDeadband(-operator.getPitch(), 0.1));
-
-                SmartDashboard.putNumber("Wrist Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
-            }, subsys));
-        }
-    );
-
-    // GetPositionSubsys ballIntakeTesting = new GetPositionSubsys(
-    //     "BallIntake",
-    //     10,
-    //     (subsys) -> {
-    //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
-    //         subsys.setDefaultCommand(Commands.runOnce(() -> {
-    //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftX(), 0.1));
-    //         }, subsys));
-    //     }
-    // );
-
-    GetPositionSubsys pipeIntakeTesting = new GetPositionSubsys(
-        "PipeIntake",
-        11,
-        10,
-        false,
-        (subsys) -> {
-            subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
-            
-            subsys.setDefaultCommand(Commands.runOnce(() -> {
-                subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightY(), 0.1));
-            }, subsys));
-        }
-    );
-
 
     /* ----------------- Generated Stuff ----------------- */
     private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -128,7 +67,6 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
     
     /* --------------------------------------------------- */
 
@@ -137,47 +75,158 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Selected Auto", autoChooser);
 
-        registerNamedCommands();
+        elevatorSubsys = new ElevatorSubsys();
+        pipeIntakeSubsys = new PipeIntakeSubsys();
+        ballIntakeSubsys = new BallIntakeSubsys();
+        wristSubsys = new WristSubsys();
+
+        // elevatorSubsys = null;
+        // pipeIntakeSubsys = null;
+        // ballIntakeSubsys = null;
+        // wristSubsys = null;
+
+        // GetPositionSubsys elevatorTesting = new GetPositionSubsys(
+        //     "Elevator",
+        //     12,
+        //     13,
+        //     false,
+        //     (subsys) -> {
+        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
+        //         ElevatorFeedforward ff = new ElevatorFeedforward(Constants.ElevatorConstants.kS, Constants.ElevatorConstants.kG, Constants.ElevatorConstants.kV);
+        //         subsys.maxes.reset();
+        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
+        //             if (input != 0) {
+        //                 double maxVelocity = 0.5;
+        //                 subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
+        //             } else {
+        //                 subsys.mainMotor.setVoltage(ff.calculate(0));
+        //             }
+        //             // subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
+        //             SmartDashboard.putNumber("Position", subsys.mainMotor.getPosition().getValueAsDouble());
+        //         }, subsys));
+        //     }
+        // );
+
+        // GetPositionSubsys wristTesting = new GetPositionSubsys(
+        //     "Wrist",
+        //     8,
+        //     9,
+        //     true,
+        //     (subsys) -> {
+        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
+        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //             subsys.mainMotor.set(MathUtil.applyDeadband(-operator.getPitch(), 0.1));
+        //             // SmartDashboard.putNumber("Wrist Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
+        //         }, subsys));
+        //     }
+        // );
+
+        // GetPositionSubsys ballIntakeTesting = new GetPositionSubsys(
+        //     "BallIntake",
+        //     10,
+        //     (subsys) -> {
+        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
+        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftX(), 0.1));
+        //         }, subsys));
+        //     }
+        // );
+
+        // GetPositionSubsys pipeIntakeTesting = new GetPositionSubsys(
+        //     "PipeIntake",
+        //     11,
+        //     10,
+        //     false,
+        //     (subsys) -> {
+        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
+        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightX(), 0.1));
+        //         }, subsys));
+        //     }
+        // );
+
+        // registerNamedCommands();
         configureBindings();
 
         CameraServer.startAutomaticCapture();
     }
 
-    private void registerNamedCommands() {
-        // NamedCommands.registerCommand("IntakePipe", new InstantCommand(() -> {
-        //     pipeIntakeSubsys.setSpeed(PipeIntakeSpeed.INTAKE);
-        //     ballIntakeSubsys.setSpeedFromPipeSpeed(PipeIntakeSpeed.INTAKE);
-        // }, pipeIntakeSubsys));
-        // NamedCommands.registerCommand("EjectPipe", new InstantCommand(() -> pipeIntakeSubsys.setSpeed(PipeIntakeSpeed.EJECT), pipeIntakeSubsys));
-        // NamedCommands.registerCommand("IntakeBall", new InstantCommand(() -> ballIntakeSubsys.setSpeed(BallIntakeSpeed.INTAKE), ballIntakeSubsys));
-        // NamedCommands.registerCommand("EjectBall", new InstantCommand(() -> ballIntakeSubsys.setSpeed(BallIntakeSpeed.EJECT), ballIntakeSubsys));
-    }
-
     private void configureBindings() {
-        // configureSwerveButtons();
+        configureSwerveButtons();
 
-        // // driver.b().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(0), wristSubsys));
-        // // driver.y().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(90), wristSubsys));
-        // // driver.x().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(180), wristSubsys));
-        // // driver.a().onTrue(Commands.runOnce(() -> wristSubsys.wristMotor.setPosition(270), wristSubsys));
-        // // wristSubsys.setDefaultCommand(Commands.runOnce(() -> wristSubsys.wristMotor.set(driver.getLeftX()), wristSubsys));
+        if (elevatorSubsys != null) {
+            if (pipeIntakeSubsys != null && ballIntakeSubsys != null) {
+                operator.button(1).onTrue(Commands.runOnce(() -> {
+                    PipeIntakeSpeed speed;
+                    if (Math.abs(elevatorSubsys.getPIDController().getGoal().position - elevatorSubsys.getMotorRotations()) < 1) {
+                        speed = PipeIntakeSpeed.L1_EJECT;
+                    } else {
+                        speed = PipeIntakeSpeed.EJECT;
+                    }
+                    setSpeedPipeAndBall(speed).initialize();
+                }, pipeIntakeSubsys, ballIntakeSubsys)).onFalse(setSpeedPipeAndBall(PipeIntakeSpeed.OFF));
 
-        operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1));
-        operator.button(12).onTrue(elevatorSubsys.goTo(ElevatorPosition.L2));
-        operator.button(9).onTrue(elevatorSubsys.goTo(ElevatorPosition.L3));
-        operator.button(10).onTrue(elevatorSubsys.goTo(ElevatorPosition.L4));
+                operator.button(2).onTrue(
+                    Commands.sequence(
+                        elevatorSubsys.goTo(ElevatorPosition.HUMAN_PLAYER_INTAKE),
+                        new WaitCommand(0.5),
+                        wristSubsys.goTo(WristSetpoint.HUMAN_PLAYER_INTAKE)
+                    )
+                    .andThen(Commands.parallel(
+                        pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.INTAKE),
+                        ballIntakeSubsys.setSpeedFromPipeSpeedCommand(PipeIntakeSpeed.INTAKE)
+                    ))
+                ).onFalse(
+                    Commands.sequence(
+                        pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.OFF),
+                        ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF),
+                        resetElevator()
+                    )
+                );
+            }
+
+            operator.button(10).onTrue(elevatorSubsys.goTo(ElevatorPosition.L4)).onFalse(resetElevator());
+            operator.button(9).onTrue(elevatorSubsys.goTo(ElevatorPosition.L3)).onFalse(resetElevator());
+            operator.button(12).onTrue(elevatorSubsys.goTo(ElevatorPosition.L2)).onFalse(resetElevator());
+            operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1)).onFalse(resetElevator());
+        }
     }
 
-    private void configureSwerveButtons() {        
+    private Command setSpeedPipeAndBall(PipeIntakeSpeed speed) {
+        return Commands.runOnce(() -> {
+            pipeIntakeSubsys.setSpeed(speed);
+            ballIntakeSubsys.setSpeedFromPipeSpeed(speed);
+        }, pipeIntakeSubsys, ballIntakeSubsys);
+    }
+
+    private Command resetElevator() {
+        return Commands.sequence(
+            wristSubsys.goTo(WristSetpoint.START_POS),
+            elevatorSubsys.goTo(ElevatorPosition.MIN_HEIGHT)
+        );
+    }
+
+    private void configureSwerveButtons() {
+        final double REDUCE_SPEED_WHEN_ELEV_UP = 5.0;
+
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getLeftY() * MaxSpeed * drivetrain.getCurrentSpeedMulti()) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getLeftX() * MaxSpeed * drivetrain.getCurrentSpeedMulti()) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+            drivetrain.applyRequest(() -> {
+                double velocityX = -driver.getLeftY() * MaxSpeed * drivetrain.getCurrentSpeedMulti(); // Drive forward with negative Y (forward)
+                double velocityY = -driver.getLeftX() * MaxSpeed * drivetrain.getCurrentSpeedMulti(); // Drive left with negative X (left)
+                double rotationalRate = -driver.getRightX() * MaxAngularRate; // Drive counterclockwise with negative X (left)
+
+                if (elevatorSubsys != null && elevatorSubsys.getMotorRotations() > 1) {
+                    velocityX /= REDUCE_SPEED_WHEN_ELEV_UP;
+                    velocityY /= REDUCE_SPEED_WHEN_ELEV_UP;
+                }
+
+                return drive.withVelocityX(velocityX)
+                    .withVelocityY(velocityY)
+                    .withRotationalRate(rotationalRate);
+            })
         );
 
         driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -197,7 +246,22 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        driver.leftBumper().onChange(new InstantCommand(() -> drivetrain.toggleHalfSpeed()));
+        driver.leftBumper().onTrue(drivetrain.toggleHalfSpeed());
+    }
+
+    private void registerNamedCommands() {
+        registerCommand("IntakePipe", new InstantCommand(() -> {
+            pipeIntakeSubsys.setSpeed(PipeIntakeSpeed.INTAKE);
+            ballIntakeSubsys.setSpeedFromPipeSpeed(PipeIntakeSpeed.INTAKE);
+        }, pipeIntakeSubsys, ballIntakeSubsys));
+        registerCommand("EjectPipe", new InstantCommand(() -> pipeIntakeSubsys.setSpeed(PipeIntakeSpeed.EJECT), pipeIntakeSubsys));
+        registerCommand("IntakeBall", new InstantCommand(() -> ballIntakeSubsys.setSpeed(BallIntakeSpeed.INTAKE), ballIntakeSubsys));
+        registerCommand("EjectBall", new InstantCommand(() -> ballIntakeSubsys.setSpeed(BallIntakeSpeed.EJECT), ballIntakeSubsys));
+    }
+    private void registerCommand(String name, Command command) {
+        try {
+            NamedCommands.registerCommand(name, command);
+        } catch (NullPointerException e) {}
     }
 
     public Command getAutonomousCommand() {
