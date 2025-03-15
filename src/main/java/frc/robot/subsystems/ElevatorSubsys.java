@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.subsystems.PipeIntakeSubsys.PipeIntakeSpeed;
 
 public class ElevatorSubsys extends SubsystemBase {
   private static ElevatorSubsys instance;
@@ -60,27 +61,16 @@ public class ElevatorSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("EPos0", elevatorMotor.getPosition().getValueAsDouble());
-    SmartDashboard.putNumber("EPos1", secondElevatorMotor.getPosition().getValueAsDouble());
-
-    // double elevatorPosition = elevatorMotor.getPosition().getValueAsDouble();
-    // if (pidControllerUp.getGoal() != null) {
-    //   pidOutput = pidControllerUp.calculate(elevatorPosition);
-    //   feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
-    //   SmartDashboard.putString("CurrPID", "Up");
-    // } else if (pidControllerDown.getGoal() != null) {
-    //   pidOutput = pidControllerDown.calculate(elevatorPosition);
-    //   feedForwardOutput = feedforward.calculate(pidControllerDown.getSetpoint().velocity);
-    //   SmartDashboard.putString("CurrPID", "Down");
-    // } else {
-    //   pidOutput = 0;
-    //   feedForwardOutput = feedforward.calculate(0);
-    // }
-
-    pidOutput = pidController.calculate(elevatorMotor.getPosition().getValueAsDouble());
-    // feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
-    feedForwardOutput = 0;
-    elevatorMotor.setVoltage(pidOutput + feedForwardOutput);
+    double output;
+    if (pidController.getGoal().position == ElevatorPosition.MIN_HEIGHT.rotations && getMotorRotations() < 1 ) {
+      output = 0;
+    } else {
+      pidOutput = pidController.calculate(elevatorMotor.getPosition().getValueAsDouble());
+      // feedForwardOutput = feedforward.calculate(pidControllerUp.getSetpoint().velocity);
+      feedForwardOutput = 0;
+      output = pidOutput + feedForwardOutput;
+    }
+    elevatorMotor.setVoltage(output);
   }
 
   public enum ElevatorPosition {

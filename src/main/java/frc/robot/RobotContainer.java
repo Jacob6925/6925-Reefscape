@@ -149,7 +149,9 @@ public class RobotContainer {
         // registerNamedCommands();
         configureBindings();
 
-        CameraServer.startAutomaticCapture();
+        CameraServer.startAutomaticCapture(0);
+        CameraServer.startAutomaticCapture(1);
+        // http://roborio-6925-frc.local:1181/
     }
 
     private void configureBindings() {
@@ -208,7 +210,7 @@ public class RobotContainer {
     }
 
     private void configureSwerveButtons() {
-        final double REDUCE_SPEED_WHEN_ELEV_UP = 5.0;
+        final double REDUCE_SPEED_WHEN_ELEV_UP = 7.5;//5.0;
 
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
