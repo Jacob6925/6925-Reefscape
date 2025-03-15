@@ -55,15 +55,45 @@ public class TunerConstants {
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
-    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration();
+    private static final TalonFXConfiguration driveInitialConfigs = new TalonFXConfiguration()
+        .withCurrentLimits(
+            new CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(35)
+                .withSupplyCurrentLowerLimit(60)
+                .withSupplyCurrentLowerTime(0.1)
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(80)
+        );
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
         .withCurrentLimits(
             new CurrentLimitsConfigs()
-                // Swerve azimuth does not require much torque output, so we can set a relatively low
-                // stator current limit to help avoid brownouts without impacting performance.
-                .withStatorCurrentLimit(Amps.of(60))
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(25)
+                .withSupplyCurrentLowerLimit(40)
+                .withSupplyCurrentLowerTime(0.1)
                 .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(60)
         );
+
+        /*
+        Values from Crescendo robot:
+
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = 35;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentThreshold = 60;
+        swerveDriveFXConfig.CurrentLimits.SupplyTimeThreshold = 0.1;
+
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = 80;
+
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimit = 25;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentThreshold = 40;
+        swerveAngleFXConfig.CurrentLimits.SupplyTimeThreshold = 0.1;
+
+        using default values for angle stator current limits
+        */
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
     private static final Pigeon2Configuration pigeonConfigs = null;
