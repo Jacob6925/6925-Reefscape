@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -139,7 +140,7 @@ public class RobotContainer {
         //     }
         // );
 
-        // registerNamedCommands();
+        registerNamedCommands();
         configureBindings();
 
         CameraServer.startAutomaticCapture(0);
@@ -162,17 +163,7 @@ public class RobotContainer {
                     setSpeedPipeAndBall(speed).initialize();
                 }, pipeIntakeSubsys, ballIntakeSubsys)).onFalse(setSpeedPipeAndBall(PipeIntakeSpeed.OFF));
 
-                operator.button(2).onTrue(
-                    Commands.sequence(
-                        elevatorSubsys.goTo(ElevatorPosition.HUMAN_PLAYER_INTAKE),
-                        new WaitCommand(0.5),
-                        wristSubsys.goTo(WristSetpoint.HUMAN_PLAYER_INTAKE)
-                    )
-                    .andThen(Commands.parallel(
-                        pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.INTAKE),
-                        ballIntakeSubsys.setSpeedFromPipeSpeedCommand(PipeIntakeSpeed.INTAKE)
-                    ))
-                ).onFalse(
+                operator.button(2).onTrue(humanPlayerActionsCommand).onFalse(
                     Commands.sequence(
                         pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.OFF),
                         ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF),
@@ -244,19 +235,32 @@ public class RobotContainer {
         driver.leftBumper().onTrue(drivetrain.toggleHalfSpeed());
     }
 
+    private Command humanPlayerActionsCommand;
+
     private void registerNamedCommands() {
-        registerCommand("IntakePipe", new InstantCommand(() -> {
-            pipeIntakeSubsys.setSpeed(PipeIntakeSpeed.INTAKE);
-            ballIntakeSubsys.setSpeedFromPipeSpeed(PipeIntakeSpeed.INTAKE);
-        }, pipeIntakeSubsys, ballIntakeSubsys));
-        registerCommand("EjectPipe", new InstantCommand(() -> pipeIntakeSubsys.setSpeed(PipeIntakeSpeed.EJECT), pipeIntakeSubsys));
-        registerCommand("IntakeBall", new InstantCommand(() -> ballIntakeSubsys.setSpeed(BallIntakeSpeed.INTAKE), ballIntakeSubsys));
-        registerCommand("EjectBall", new InstantCommand(() -> ballIntakeSubsys.setSpeed(BallIntakeSpeed.EJECT), ballIntakeSubsys));
-    }
-    private void registerCommand(String name, Command command) {
-        try {
-            NamedCommands.registerCommand(name, command);
-        } catch (NullPointerException e) {}
+        humanPlayerActionsCommand = new SequentialCommandGroup(
+                elevatorSubsys.goTo(ElevatorPosition.HUMAN_PLAYER_INTAKE),
+                new WaitCommand(0.5),
+                wristSubsys.goTo(WristSetpoint.HUMAN_PLAYER_INTAKE)
+            ).andThen(
+                pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.INTAKE),
+                ballIntakeSubsys.setSpeedFromPipeSpeedCommand(PipeIntakeSpeed.INTAKE)
+        );
+
+        NamedCommands.registerCommand("MoveTo-L1", elevatorSubsys.goTo(ElevatorPosition.L1));
+        NamedCommands.registerCommand("MoveTo-L2", elevatorSubsys.goTo(ElevatorPosition.L2));
+        NamedCommands.registerCommand("MoveTo-L3", elevatorSubsys.goTo(ElevatorPosition.L3));
+        NamedCommands.registerCommand("MoveTo-L4", elevatorSubsys.goTo(ElevatorPosition.L4));
+        NamedCommands.registerCommand("MoveTo-HP", humanPlayerActionsCommand);
+        NamedCommands.registerCommand("ResetElevator", new InstantCommand(() -> elevatorSubsys.resetElevatorSetpoint(), elevatorSubsys));
+        NamedCommands.registerCommand("IntakePipe", new SequentialCommandGroup(
+            pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.INTAKE),
+            ballIntakeSubsys.setSpeedFromPipeSpeedCommand(PipeIntakeSpeed.INTAKE)
+        ));
+        NamedCommands.registerCommand("EjectPipe", new SequentialCommandGroup(
+            pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.EJECT),
+            ballIntakeSubsys.setSpeedFromPipeSpeedCommand(PipeIntakeSpeed.EJECT)
+        ));
     }
 
     public Command getAutonomousCommand() {
