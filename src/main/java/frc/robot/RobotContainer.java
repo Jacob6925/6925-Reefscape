@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -194,7 +195,7 @@ public class RobotContainer {
     }
 
     private void configureSwerveButtons() {
-        final double REDUCE_SPEED_WHEN_ELEV_UP = 7.5;//5.0;
+        final double REDUCE_SPEED_WHEN_ELEV_UP = 6.5; //5.0 too low; 7.5 too high
 
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -228,11 +229,14 @@ public class RobotContainer {
         driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        driver.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driver.y().onTrue(new ParallelCommandGroup(
+            drivetrain.runOnce(() -> drivetrain.seedFieldCentric()),
+            wristSubsys.goTo(WristSetpoint.START_POS)
+        ));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        driver.leftBumper().onTrue(drivetrain.toggleHalfSpeed());
+        driver.leftBumper().onTrue(drivetrain.toggleSpeedMulti(1/3.0));
     }
 
     private Command humanPlayerActionsCommand;

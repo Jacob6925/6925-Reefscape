@@ -294,7 +294,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        SmartDashboard.putBoolean("Half Speed", speedMulti != 1);
+        SmartDashboard.putBoolean("Speed Reduced", speedMulti != 1);
         SmartDashboard.putNumber("Speed Multi", speedMulti);
     }
 
@@ -347,11 +347,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
     }
 
-    /* Half Speed */
+    /* Speed Multiplier */
     private double speedMulti = 1.0;
 
-    public Command toggleHalfSpeed() {
-        return Commands.runOnce(() -> speedMulti = (speedMulti == 1.0 ? 0.5 : 1.0), this);
+    public Command toggleSpeedMulti(double multi) {
+        return Commands.runOnce(() -> speedMulti = (speedMulti == 1.0 ? multi : 1.0), this);
     }
 
     public double getCurrentSpeedMulti() {
