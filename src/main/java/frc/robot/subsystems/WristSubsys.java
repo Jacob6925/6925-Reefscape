@@ -51,9 +51,8 @@ public class WristSubsys extends SubsystemBase {
   public void periodic() {
     double wristPosition = wristMotor.getPosition().getValueAsDouble();
     pidOutput = pidController.calculate(wristPosition);
-    SmartDashboard.putNumber("CURR POSITION:", wristPosition);
-    SmartDashboard.putNumber("GOAL:", pidController.getGoal().position);
-    SmartDashboard.putNumber("OUTPUT:", pidOutput);
+    
+    // SmartDashboard.putNumber("WRIST POSITION", wristPosition);
 
     // feedForwardOutput = feedForward.calculate(wristPosition, pidController.getSetpoint().velocity);
     feedForwardOutput = 0;
@@ -65,10 +64,11 @@ public class WristSubsys extends SubsystemBase {
     MAX_POS(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold),
     START_POS(0),
     MIN_POS(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold),
-    HALF_FORWARD(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold/2),
-    HALF_REVERSE(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold/2),
     
-    HUMAN_PLAYER_INTAKE(6.75);
+    HUMAN_PLAYER_INTAKE(7),
+    L2_L3(-10.75),
+    L4(-5),
+    REMOVE_ALGAE(MAX_POS.rotations-0.75);
 
     public final double rotations;
     private WristSetpoint(double rotations) {

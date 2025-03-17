@@ -16,7 +16,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -89,7 +88,7 @@ public class RobotContainer {
         //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
         //         ElevatorFeedforward ff = new ElevatorFeedforward(Constants.ElevatorConstants.kS, Constants.ElevatorConstants.kG, Constants.ElevatorConstants.kV);
         //         subsys.maxes.reset();
-        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //         subsys.setDefaultCommand(new InstantCommand(() -> {
         //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
         //             if (input != 0) {
         //                 double maxVelocity = 0.5;
@@ -98,7 +97,6 @@ public class RobotContainer {
         //                 subsys.mainMotor.setVoltage(ff.calculate(0));
         //             }
         //             // subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
-        //             SmartDashboard.putNumber("Position", subsys.mainMotor.getPosition().getValueAsDouble());
         //         }, subsys));
         //     }
         // );
@@ -110,9 +108,8 @@ public class RobotContainer {
         //     true,
         //     (subsys) -> {
         //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
-        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //         subsys.setDefaultCommand(new InstantCommand(() -> {
         //             subsys.mainMotor.set(MathUtil.applyDeadband(-operator.getPitch(), 0.1));
-        //             // SmartDashboard.putNumber("Wrist Voltage", subsys.mainMotor.getMotorVoltage().getValueAsDouble());
         //         }, subsys));
         //     }
         // );
@@ -122,7 +119,7 @@ public class RobotContainer {
         //     10,
         //     (subsys) -> {
         //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
-        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //         subsys.setDefaultCommand(new InstantCommand(() -> {
         //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftX(), 0.1));
         //         }, subsys));
         //     }
@@ -135,7 +132,7 @@ public class RobotContainer {
         //     false,
         //     (subsys) -> {
         //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
-        //         subsys.setDefaultCommand(Commands.runOnce(() -> {
+        //         subsys.setDefaultCommand(new InstantCommand(() -> {
         //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightX(), 0.1));
         //         }, subsys));
         //     }
@@ -152,50 +149,65 @@ public class RobotContainer {
     private void configureBindings() {
         configureSwerveButtons();
 
-        if (elevatorSubsys != null) {
-            if (pipeIntakeSubsys != null && ballIntakeSubsys != null) {
-                operator.button(1).onTrue(Commands.runOnce(() -> {
-                    PipeIntakeSpeed speed;
-                    if (Math.abs(elevatorSubsys.getPIDController().getGoal().position - elevatorSubsys.getMotorRotations()) < 1) {
-                        speed = PipeIntakeSpeed.L1_EJECT;
-                    } else {
-                        speed = PipeIntakeSpeed.EJECT;
-                    }
-                    setSpeedPipeAndBall(speed).initialize();
-                }, pipeIntakeSubsys, ballIntakeSubsys)).onFalse(setSpeedPipeAndBall(PipeIntakeSpeed.OFF));
-
-                operator.button(2).onTrue(humanPlayerActionsCommand).onFalse(
-                    Commands.sequence(
-                        pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.OFF),
-                        ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF),
-                        resetElevator()
-                    )
-                );
+        operator.button(1).onTrue(new InstantCommand(() -> {
+            PipeIntakeSpeed speed;
+            if (Math.abs(elevatorSubsys.getPIDController().getGoal().position - elevatorSubsys.getMotorRotations()) < ElevatorPosition.L1.rotations+1) {
+                speed = PipeIntakeSpeed.L1_EJECT;
+            } else {
+                speed = PipeIntakeSpeed.EJECT;
             }
+            setSpeedPipeAndBall(speed).initialize();
+        }, pipeIntakeSubsys, ballIntakeSubsys)).onFalse(setSpeedPipeAndBall(PipeIntakeSpeed.OFF));
 
-            operator.button(10).onTrue(elevatorSubsys.goTo(ElevatorPosition.L4)).onFalse(resetElevator());
-            operator.button(9).onTrue(elevatorSubsys.goTo(ElevatorPosition.L3)).onFalse(resetElevator());
-            operator.button(12).onTrue(elevatorSubsys.goTo(ElevatorPosition.L2)).onFalse(resetElevator());
-            operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1)).onFalse(resetElevator());
-        }
+        operator.button(2).onTrue(humanPlayerActionsCommand).onFalse(
+            new SequentialCommandGroup(
+                pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.OFF),
+                ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF),
+                resetElevator()
+            )
+        );
+
+        operator.button(10).onTrue(elevatorLevelActions(ElevatorPosition.L4, WristSetpoint.L4)).onFalse(resetElevator());
+        operator.button(9).onTrue(elevatorLevelActions(ElevatorPosition.L3, WristSetpoint.L2_L3)).onFalse(resetElevator());
+        operator.button(12).onTrue(elevatorLevelActions(ElevatorPosition.L2, WristSetpoint.L2_L3)).onFalse(resetElevator());
+        operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1)).onFalse(resetElevator());
+
+        operator.button(7).onTrue(intakeBall(ElevatorPosition.REMOVE_ALGAE_L2)).onFalse(resetElevator());
+        operator.button(8).onTrue(intakeBall(ElevatorPosition.REMOVE_ALGAE_L3)).onFalse(resetElevator());
     }
 
     private Command setSpeedPipeAndBall(PipeIntakeSpeed speed) {
-        return Commands.runOnce(() -> {
+        return new InstantCommand(() -> {
             pipeIntakeSubsys.setSpeed(speed);
             ballIntakeSubsys.setSpeedFromPipeSpeed(speed);
         }, pipeIntakeSubsys, ballIntakeSubsys);
     }
 
     private Command resetElevator() {
-        return Commands.sequence(
+        return new SequentialCommandGroup(
             wristSubsys.goTo(WristSetpoint.START_POS),
+            new WaitCommand(0.25),
             elevatorSubsys.goTo(ElevatorPosition.MIN_HEIGHT)
         );
     }
 
+    private Command elevatorLevelActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint) {
+        return new SequentialCommandGroup(
+            elevatorSubsys.goTo(elevatorPosition),
+            new WaitCommand(0.5),
+            wristSubsys.goTo(wristSetpoint)
+        );
+    }
+
+    private Command intakeBall(ElevatorPosition elevatorPosition) {
+        return new SequentialCommandGroup(
+            elevatorLevelActions(elevatorPosition, WristSetpoint.REMOVE_ALGAE).until(() -> Math.abs(elevatorSubsys.getMotorRotations() - elevatorPosition.rotations) > 1),
+            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.INTAKE)
+        );
+    }
+
     private void configureSwerveButtons() {
-        final double REDUCE_SPEED_WHEN_ELEV_UP = 6.5; //5.0 too low; 7.5 too high
+        final double REDUCE_SPEED_WHEN_ELEV_UP = 5.0;
 
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.

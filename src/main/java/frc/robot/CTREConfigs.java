@@ -17,7 +17,7 @@ public class CTREConfigs {
     public CTREConfigs() {
         // Elevator Config
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 24.6;
+        ELEVATOR_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 25.5;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -43,9 +43,9 @@ public class CTREConfigs {
 
         // Wrist Config
         WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
-        WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 26;
-        // WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+        WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 17;
+        WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+        WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -15;
         WRIST_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         WRIST_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
         // WRIST_CONFIG.CurrentLimits.StatorCurrentLimit = 50;

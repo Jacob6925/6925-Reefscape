@@ -9,6 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -58,6 +59,8 @@ public class ElevatorSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // SmartDashboard.putNumber("ELEV POSITION", elevatorMotor.getPosition().getValueAsDouble());
+
     double output;
     if (pidController.getGoal().position == ElevatorPosition.MIN_HEIGHT.rotations && getMotorRotations() < 1 ) {
       output = 0;
@@ -78,10 +81,12 @@ public class ElevatorSubsys extends SubsystemBase {
     MIN_HEIGHT(0),
     
     L1(1.67822265625),
-    L2(4.94384765625),
-    L3(12.37548828125),
+    L2(8.25), //8.289
+    L3(15.6),
     L4(MAX_HEIGHT.rotations),
-    HUMAN_PLAYER_INTAKE(5.2319);
+    HUMAN_PLAYER_INTAKE(4.9),
+    REMOVE_ALGAE_L2(L2.rotations + 1.4),
+    REMOVE_ALGAE_L3(L3.rotations + 1.4);
 
     public final double rotations;
     private ElevatorPosition(double rotations) {

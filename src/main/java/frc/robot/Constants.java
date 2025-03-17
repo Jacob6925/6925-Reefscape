@@ -45,8 +45,8 @@ public final class Constants {
 
   public static final class WristConstants {
     // Trapezoidal Profile Variables
-    public static final double kP = 0.25;
-    public static final double kI = 0.0;
+    public static final double kP = 0.35;
+    public static final double kI = 0.05;
     public static final double kD = 0.0;
     public static final double MAX_VELOCITY = 0.0;
     public static final double MAX_ACCEL = 0.0;

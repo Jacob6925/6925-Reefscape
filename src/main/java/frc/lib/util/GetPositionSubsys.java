@@ -47,6 +47,6 @@ public class GetPositionSubsys extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putNumber("(" + id + ") Main Motor Rotations", mainMotor.getPosition().getValueAsDouble());
-    if (subMotor != null) SmartDashboard.putNumber("(" + id + ") Sub-Motor Rotations", subMotor.getPosition().getValueAsDouble());
+    // if (subMotor != null) SmartDashboard.putNumber("(" + id + ") Sub-Motor Rotations", subMotor.getPosition().getValueAsDouble());
   }
 }
