@@ -1,0 +1,163 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T-To Score 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveTo-L2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T-ToDescore"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DescoreL3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T-Score 1 to Net"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectAlgae"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T-Net to HP"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveTo-Hp"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakePipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "T-HP to Score 2 L3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "MoveTo-L3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EjectPipe"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
