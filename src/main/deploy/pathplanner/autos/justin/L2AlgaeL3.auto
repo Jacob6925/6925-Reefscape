@@ -49,13 +49,13 @@
         {
           "type": "named",
           "data": {
-            "name": "ResetElevator"
+            "name": "StopIntake"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopIntake"
+            "name": "ResetElevator"
           }
         },
         {
@@ -91,7 +91,7 @@
         {
           "type": "named",
           "data": {
-            "name": "MoveTo-Hp"
+            "name": "MoveTo-HP"
           }
         },
         {
