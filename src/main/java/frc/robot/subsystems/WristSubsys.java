@@ -65,10 +65,13 @@ public class WristSubsys extends SubsystemBase {
     START_POS(0),
     MIN_POS(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold),
     
-    HUMAN_PLAYER_INTAKE(7),
+    HUMAN_PLAYER_INTAKE(14),
     L2_L3(-10.75),
     L4(-5),
-    REMOVE_ALGAE(MAX_POS.rotations-0.75);
+    REMOVE_ALGAE(23),
+    
+    HOLDING_POS(9),
+    BALL_HOLD(5);
 
     public final double rotations;
     private WristSetpoint(double rotations) {

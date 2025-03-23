@@ -203,43 +203,42 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * PathPlanner Methods
+     * PathPlanner
      */
+    private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     private void configureAutoBuilder() {
-        RobotConfig config = Constants.getPathPlannerConfig();
-        // Configure AutoBuilder last
-        AutoBuilder.configure(
-            this::getPose, // Robot pose supplier
-            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(TunerConstants.FrontLeft.DriveMotorGains.kP, TunerConstants.FrontLeft.DriveMotorGains.kI, TunerConstants.FrontLeft.DriveMotorGains.kD), // Translation PID constants
-                    new PIDConstants(TunerConstants.FrontLeft.SteerMotorGains.kP, TunerConstants.FrontLeft.SteerMotorGains.kI, TunerConstants.FrontLeft.SteerMotorGains.kD) // Rotation PID constants
-            ),
-            config, // The robot configuration
-            () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-              Optional<Alliance> alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-        );
-    }
-    private Pose2d getPose() {
-        return getState().Pose;
-    }
-    private ChassisSpeeds getRobotRelativeSpeeds() {
-        return getState().Speeds;
-    }
-    private void driveRobotRelative(ChassisSpeeds speeds) {
-        setControl(applyRobotSpeeds.withSpeeds(speeds));
+        try {
+            var config = RobotConfig.fromGUISettings();
+            AutoBuilder.configure(
+                () -> getState().Pose,   // Supplier of current robot pose
+                this::resetPose,         // Consumer for seeding pose against auto
+                () -> getState().Speeds, // Supplier of current robot speeds
+                // Consumer of ChassisSpeeds and feedforwards to drive the robot
+                (speeds, feedforwards) -> setControl(
+                    m_pathApplyRobotSpeeds.withSpeeds(speeds)
+                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                ),
+                // new PPHolonomicDriveController(
+                //     // PID constants for translation
+                //     new PIDConstants(10, 0, 0),
+                //     // PID constants for rotation
+                //     new PIDConstants(7, 0, 0)
+                // ),
+                new PPHolonomicDriveController(
+                    // PID constants for translation
+                    new PIDConstants(12, 0, 0),
+                    // PID constants for rotation
+                    new PIDConstants(7, 0, 0)
+                ),
+                config,
+                // Assume the path needs to be flipped for Red vs Blue, this is normally the case
+                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                this // Subsystem for requirements
+            );
+        } catch (Exception ex) {
+            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+        }
     }
 
     /**

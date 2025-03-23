@@ -1,6 +1,9 @@
 package frc.robot;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.BallIntakeSubsys;
@@ -26,7 +29,7 @@ public final class RobotCommands {
     }
 
     public static Command setSpeedPipeAndBall(PipeIntakeSpeed speed) {
-        return new SequentialCommandGroup(
+        return new ParallelCommandGroup(
             pipeIntakeSubsys.setSpeedCommand(speed),
             ballIntakeSubsys.setSpeedFromPipeSpeedCommand(speed)
         );
@@ -34,23 +37,28 @@ public final class RobotCommands {
 
     public static Command resetElevator() {
         return new SequentialCommandGroup(
-            wristSubsys.goTo(WristSetpoint.START_POS),
+            wristSubsys.goTo(WristSetpoint.HOLDING_POS),
             new WaitCommand(0.25),
             elevatorSubsys.goTo(ElevatorPosition.MIN_HEIGHT)
         );
     }
 
-    public static Command elevatorLevelActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint) {
+    public static Command elevatorLevelActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint, double waitTime) {
         return new SequentialCommandGroup(
             elevatorSubsys.goTo(elevatorPosition),
-            new WaitCommand(0.5),
+            new WaitCommand(waitTime),
             wristSubsys.goTo(wristSetpoint)
         );
     }
 
+    public static Command elevatorLevelActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint) {
+        return elevatorLevelActions(elevatorPosition, wristSetpoint, 0.75);
+    }
+
     public static Command moveElevAndIntakeBall(ElevatorPosition elevatorPosition) {
         return new SequentialCommandGroup(
-            elevatorLevelActions(elevatorPosition, WristSetpoint.REMOVE_ALGAE).until(() -> Math.abs(elevatorSubsys.getMotorRotations() - elevatorPosition.rotations) > 1),
+            elevatorLevelActions(elevatorPosition, WristSetpoint.REMOVE_ALGAE, 0.75),
+            new WaitCommand(0.5),
             ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.INTAKE)
         );
     }
@@ -67,10 +75,8 @@ public final class RobotCommands {
         return new SequentialCommandGroup(
             elevatorSubsys.goTo(ElevatorPosition.HUMAN_PLAYER_INTAKE),
             new WaitCommand(0.5),
-            wristSubsys.goTo(WristSetpoint.HUMAN_PLAYER_INTAKE)
-        ).andThen(
-            pipeIntakeSubsys.setSpeedCommand(PipeIntakeSpeed.INTAKE),
-            ballIntakeSubsys.setSpeedFromPipeSpeedCommand(PipeIntakeSpeed.INTAKE)
+            wristSubsys.goTo(WristSetpoint.HUMAN_PLAYER_INTAKE),
+            setSpeedPipeAndBall(PipeIntakeSpeed.INTAKE)
         );
     }
 
@@ -85,8 +91,32 @@ public final class RobotCommands {
         }
         return new SequentialCommandGroup(
             ejectCommand,
-            new WaitCommand(3.0),
+            new WaitCommand(0.5),
             setSpeedPipeAndBall(PipeIntakeSpeed.OFF)
+        );
+    }
+
+    public static Command liftAndShoot() {
+        return new SequentialCommandGroup(
+            // change to elevator actions to add wrist point
+            elevatorSubsys.goTo(ElevatorPosition.MAX_HEIGHT),
+            new WaitCommand(1),
+            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.EJECT),
+            new WaitCommand(2),
+            elevatorSubsys.goTo(ElevatorPosition.MIN_HEIGHT),
+            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF)
+        );
+    }
+
+    public static BooleanSupplier elevatorAtSetpoint(ElevatorPosition goal) {
+        return () -> Math.abs(elevatorSubsys.getMotorRotations() - goal.rotations) < 1;
+    }
+
+    public static Command outtakeBall(ElevatorPosition elevatorPosition) {
+        return new SequentialCommandGroup(
+            elevatorSubsys.goTo(elevatorPosition),
+            new WaitCommand(1),
+            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.EJECT)
         );
     }
 }

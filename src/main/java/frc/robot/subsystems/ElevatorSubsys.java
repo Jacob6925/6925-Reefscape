@@ -59,7 +59,7 @@ public class ElevatorSubsys extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // SmartDashboard.putNumber("ELEV POSITION", elevatorMotor.getPosition().getValueAsDouble());
+    SmartDashboard.putNumber("ELEV POSITION", elevatorMotor.getPosition().getValueAsDouble());
 
     double output;
     if (pidController.getGoal().position == ElevatorPosition.MIN_HEIGHT.rotations && getMotorRotations() < 1 ) {
@@ -80,13 +80,16 @@ public class ElevatorSubsys extends SubsystemBase {
     THREE_ROT(3),
     MIN_HEIGHT(0),
     
-    L1(1.67822265625),
-    L2(8.25), //8.289
-    L3(15.6),
+    L1(1.678),
+    L2(9),
+    L3(16.35),
     L4(MAX_HEIGHT.rotations),
-    HUMAN_PLAYER_INTAKE(4.9),
-    REMOVE_ALGAE_L2(L2.rotations + 1.4),
-    REMOVE_ALGAE_L3(L3.rotations + 1.4);
+    HUMAN_PLAYER_INTAKE(1.9), //decrease by 0.05
+    REMOVE_ALGAE_L2(L2.rotations + 1),
+    REMOVE_ALGAE_L3(L3.rotations + 0.8),
+    DEPOSIT_BALL(2),
+    
+    BALL_HOLD(3);
 
     public final double rotations;
     private ElevatorPosition(double rotations) {
@@ -100,6 +103,8 @@ public class ElevatorSubsys extends SubsystemBase {
 
   public void resetElevatorSetpoint() {
     pidController.setGoal(new TrapezoidProfile.State());
+    elevatorMotor.setPosition(0);
+    secondElevatorMotor.setPosition(0);
   }
 
   public double getMotorRotations() {

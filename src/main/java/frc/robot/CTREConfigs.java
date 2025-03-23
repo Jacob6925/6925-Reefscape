@@ -29,7 +29,7 @@ public class CTREConfigs {
         // Ball Intake Config
         BALL_INTAKE_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
-        // BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 60;
         BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
         // BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
         

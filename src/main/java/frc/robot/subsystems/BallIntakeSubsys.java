@@ -42,7 +42,8 @@ public class BallIntakeSubsys extends SubsystemBase {
 	public enum BallIntakeSpeed {
 		OFF(0),
 		INTAKE(0.5),
-		EJECT(-0.5);
+		EJECT(-0.5),
+		HOLD_BALL(0.1);
 
 		public final double value;
 		BallIntakeSpeed(double value) {
