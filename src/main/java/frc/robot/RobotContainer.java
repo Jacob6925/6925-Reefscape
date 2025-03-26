@@ -22,12 +22,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.lib.CommandX3DController;
 import frc.lib.TunerConstants;
-import frc.lib.util.GetPositionSubsys;
 import frc.robot.subsystems.BallIntakeSubsys;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ElevatorSubsys;
@@ -62,7 +60,7 @@ public class RobotContainer {
     private final SwerveRequest.RobotCentric robotCentric = new SwerveRequest.RobotCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    boolean fieldCentric = true;
+    private boolean fieldCentric = true;
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -80,75 +78,7 @@ public class RobotContainer {
         ballIntakeSubsys = new BallIntakeSubsys();
         wristSubsys = new WristSubsys();
 
-        // elevatorSubsys = null;
-        // pipeIntakeSubsys = null;
-        // ballIntakeSubsys = null;
-        // wristSubsys = null;
-
         RobotCommands.init(elevatorSubsys, pipeIntakeSubsys, ballIntakeSubsys, wristSubsys);
-
-        // Elevator
-        // new GetPositionSubsys(
-        //     "Elevator",
-        //     12,
-        //     13,
-        //     false,
-        //     (subsys) -> {
-        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.ELEVATOR_CONFIG);
-        //         ElevatorFeedforward ff = new ElevatorFeedforward(Constants.ElevatorConstants.kS, Constants.ElevatorConstants.kG, Constants.ElevatorConstants.kV);
-        //         subsys.maxes.reset();
-        //         subsys.setDefaultCommand(new InstantCommand(() -> {
-        //             double input = MathUtil.applyDeadband(-driver.getLeftY(), 0.1);
-        //             if (input != 0) {
-        //                 double maxVelocity = 0.5;
-        //                 subsys.mainMotor.set(MathUtil.clamp(input, -maxVelocity, maxVelocity));
-        //             } else {
-        //                 subsys.mainMotor.setVoltage(ff.calculate(0));
-        //             }
-        //             // subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftY(), 0.1));
-        //         }, subsys));
-        //     }
-        // );
-
-        // Wrist
-        // new GetPositionSubsys(
-        //     "Wrist",
-        //     8,
-        //     9,
-        //     true,
-        //     (subsys) -> {
-        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.WRIST_CONFIG);
-        //         subsys.setDefaultCommand(new InstantCommand(() -> {
-        //             subsys.mainMotor.set(MathUtil.applyDeadband(-operator.getPitch(), 0.1));
-        //         }, subsys));
-        //     }
-        // );
-
-        // Bal Intake
-        // new GetPositionSubsys(
-        //     "BallIntake",
-        //     10,
-        //     (subsys) -> {
-        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.BALL_INTAKE_CONFIG);
-        //         subsys.setDefaultCommand(new InstantCommand(() -> {
-        //             subsys.mainMotor.set(MathUtil.applyDeadband(-driver.getLeftX(), 0.1));
-        //         }, subsys));
-        //     }
-        // );
-
-        // Pipe Intake
-        // new GetPositionSubsys(
-        //     "PipeIntake",
-        //     11,
-        //     10,
-        //     false,
-        //     (subsys) -> {
-        //         subsys.mainMotor.getConfigurator().apply(Constants.Configs.PIPE_INTAKE_CONFIG);
-        //         subsys.setDefaultCommand(new InstantCommand(() -> {
-        //             subsys.mainMotor.set(MathUtil.applyDeadband(driver.getRightX(), 0.1));
-        //         }, subsys));
-        //     }
-        // );
 
         registerNamedCommands();
         configureBindings();
@@ -182,7 +112,7 @@ public class RobotContainer {
         operator.button(6).onTrue(RobotCommands.outtakeBall(ElevatorPosition.DEPOSIT_BALL)).onFalse(RobotCommands.resetIntakesAndElevator());
         operator.button(4).onTrue(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.HOLD_BALL)).onFalse(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF));
 
-        driver.button(8).onTrue(new InstantCommand(() -> elevatorSubsys.resetElevatorSetpoint()));
+        driver.button(8).onTrue(elevatorSubsys.setSpeedCommand(-0.025)).onFalse(new InstantCommand(() -> elevatorSubsys.resetElevatorSetpoint()));
     }
 
     private void configureSwerveButtons() {
@@ -192,11 +122,13 @@ public class RobotContainer {
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() -> {
+                SmartDashboard.putBoolean("Field Oriented", fieldCentric);
+
                 double velocityX = -driver.getLeftY() * MaxSpeed; // Drive forward with negative Y (forward)
                 double velocityY = -driver.getLeftX() * MaxSpeed; // Drive left with negative X (left)
                 double rotationalRate = -driver.getRightX() * MaxAngularRate; // Drive counterclockwise with negative X (left)
 
-                if (elevatorSubsys != null && elevatorSubsys.getMotorRotations() > 1) {
+                if (elevatorSubsys.getMotorRotations() > 1) {
                     velocityX /= REDUCE_SPEED_WHEN_ELEV_UP;
                     velocityY /= REDUCE_SPEED_WHEN_ELEV_UP;
                 } else {
@@ -210,8 +142,8 @@ public class RobotContainer {
                         .withRotationalRate(rotationalRate);
                 } else {
                     return robotCentric.withVelocityX(velocityX)
-                    .withVelocityY(velocityY)
-                    .withRotationalRate(rotationalRate);
+                        .withVelocityY(velocityY)
+                        .withRotationalRate(rotationalRate);
                 }
             })
         );
@@ -229,17 +161,12 @@ public class RobotContainer {
         driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        driver.y().onTrue(new ParallelCommandGroup(
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric()),
-            wristSubsys.goTo(WristSetpoint.START_POS)
-        ));
+        driver.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
         driver.leftBumper().onTrue(drivetrain.toggleSpeedMulti(1/3.0));
         driver.rightBumper().onTrue(new InstantCommand(() -> fieldCentric = !fieldCentric));
-
-        // operator.button(5).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.BALL_HOLD, WristSetpoint.BALL_HOLD)).onFalse(RobotCommands.resetElevator());
     }
 
     private void registerNamedCommands() {

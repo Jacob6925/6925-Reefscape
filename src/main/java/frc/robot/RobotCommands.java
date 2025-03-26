@@ -101,7 +101,7 @@ public final class RobotCommands {
             // change to elevator actions to add wrist point
             elevatorSubsys.goTo(ElevatorPosition.MAX_HEIGHT),
             new WaitCommand(1),
-            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.EJECT),
+            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OUTTAKE_MAX),
             new WaitCommand(2),
             elevatorSubsys.goTo(ElevatorPosition.MIN_HEIGHT),
             ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF)

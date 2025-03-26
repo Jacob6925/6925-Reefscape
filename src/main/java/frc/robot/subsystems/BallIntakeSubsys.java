@@ -43,7 +43,8 @@ public class BallIntakeSubsys extends SubsystemBase {
 		OFF(0),
 		INTAKE(0.5),
 		EJECT(-0.5),
-		HOLD_BALL(0.1);
+		HOLD_BALL(0.1),
+		OUTTAKE_MAX(-1);
 
 		public final double value;
 		BallIntakeSpeed(double value) {

@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
@@ -24,6 +25,10 @@ public class ElevatorSubsys extends SubsystemBase {
 
   private final ProfiledPIDController pidController;
   // private final ElevatorFeedforward feedforward;
+  
+  private double pidOutput = 0;
+  private double feedForwardOutput = 0;
+  private boolean controlBySpeed = false;
 
   public ElevatorSubsys() {
     if (instance != null) throw new Error("Elevator already instantiated!");
@@ -54,13 +59,19 @@ public class ElevatorSubsys extends SubsystemBase {
     });
   }
 
-  private double pidOutput = 0;
-  private double feedForwardOutput = 0;
+  public Command setSpeedCommand(double speed) {
+    return new InstantCommand(() -> {
+      controlBySpeed = true;
+      elevatorMotor.set(speed);
+    }, this);
+  }
 
   @Override
   public void periodic() {
     SmartDashboard.putNumber("ELEV POSITION", elevatorMotor.getPosition().getValueAsDouble());
 
+    if (controlBySpeed) return;
+    
     double output;
     if (pidController.getGoal().position == ElevatorPosition.MIN_HEIGHT.rotations && getMotorRotations() < 1 ) {
       output = 0;
@@ -84,9 +95,9 @@ public class ElevatorSubsys extends SubsystemBase {
     L2(9),
     L3(16.35),
     L4(MAX_HEIGHT.rotations),
-    HUMAN_PLAYER_INTAKE(1.9), //decrease by 0.05
+    HUMAN_PLAYER_INTAKE(2.075), //2.1 a bit too high
     REMOVE_ALGAE_L2(L2.rotations + 1),
-    REMOVE_ALGAE_L3(L3.rotations + 0.8),
+    REMOVE_ALGAE_L3(L3.rotations + 1),
     DEPOSIT_BALL(2),
     
     BALL_HOLD(3);
@@ -102,6 +113,8 @@ public class ElevatorSubsys extends SubsystemBase {
   }
 
   public void resetElevatorSetpoint() {
+    elevatorMotor.set(0);
+    controlBySpeed = false;
     pidController.setGoal(new TrapezoidProfile.State());
     elevatorMotor.setPosition(0);
     secondElevatorMotor.setPosition(0);

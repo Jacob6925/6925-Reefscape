@@ -294,7 +294,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         SmartDashboard.putBoolean("Speed Reduced", speedMulti != 1);
-        SmartDashboard.putNumber("Speed Multi", speedMulti);
     }
 
     private void startSimThread() {
