@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "MoveTo-L2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "EjectPipe"
+            "pathName": "Taxi"
           }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

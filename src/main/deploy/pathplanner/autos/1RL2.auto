@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "T-To 1R-Side"
+                  "pathName": "T-1R"
                 }
               },
               {
@@ -46,36 +46,6 @@
           "type": "named",
           "data": {
             "name": "EjectPipe"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ResetElevator"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "1R-To-1M"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "DescoreL3"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 3.0
           }
         },
         {
