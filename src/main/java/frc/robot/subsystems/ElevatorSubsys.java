@@ -95,7 +95,7 @@ public class ElevatorSubsys extends SubsystemBase {
     L2(9),
     L3(16.35),
     L4(MAX_HEIGHT.rotations),
-    HUMAN_PLAYER_INTAKE(2.075), //2.1 a bit too high
+    HUMAN_PLAYER_INTAKE(1.5), //2.1 a bit too high
     REMOVE_ALGAE_L2(L2.rotations + 1),
     REMOVE_ALGAE_L3(L3.rotations + 1),
     DEPOSIT_BALL(2),

@@ -22,24 +22,23 @@ public class CTREConfigs {
         ELEVATOR_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         ELEVATOR_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
-        // ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        ELEVATOR_CONFIG.CurrentLimits.StatorCurrentLimit = 80;
         ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
+        ELEVATOR_CONFIG.CurrentLimits.SupplyCurrentLimit = 60;
 
         // Ball Intake Config
         BALL_INTAKE_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
         BALL_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 60;
         BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
+        BALL_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
         
         // Pipe Intake Config
         PIPE_INTAKE_CONFIG.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        PIPE_INTAKE_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         PIPE_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
-        // PIPE_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        PIPE_INTAKE_CONFIG.CurrentLimits.StatorCurrentLimit = 60;
         PIPE_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // PIPE_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
+        PIPE_INTAKE_CONFIG.CurrentLimits.SupplyCurrentLimit = 50;
 
         // Wrist Config
         WRIST_CONFIG.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
@@ -48,8 +47,8 @@ public class CTREConfigs {
         WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold = -15;
         WRIST_CONFIG.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         WRIST_CONFIG.CurrentLimits.StatorCurrentLimitEnable = true;
-        // WRIST_CONFIG.CurrentLimits.StatorCurrentLimit = 50;
+        WRIST_CONFIG.CurrentLimits.StatorCurrentLimit = 80;
         WRIST_CONFIG.CurrentLimits.SupplyCurrentLimitEnable = true;
-        // WRIST_CONFIG.CurrentLimits.SupplyCurrentLimit = 100;
+        WRIST_CONFIG.CurrentLimits.SupplyCurrentLimit = 60;
     }
 }

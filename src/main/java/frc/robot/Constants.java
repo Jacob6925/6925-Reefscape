@@ -31,7 +31,7 @@ public final class Constants {
   
   public static final class ElevatorConstants {
     // Trapezoidal Profile Variables
-    public static final double kP = 1.0;
+    public static final double kP = 0.95;
     public static final double kI = 3.0;
     public static final double kD = 0.0;
     public static final double MAX_VELOCITY = 25; //max vel=33.49609375 rot/sec //33.49609375
