@@ -124,6 +124,20 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> {
                 SmartDashboard.putBoolean("Field Oriented", fieldCentric);
 
+                int pov = driver.getHID().getPOV();
+                if (pov != -1) {
+                    double x = 0;
+                    double y = 0;
+                    double MOVE_VEL = 0.5;
+                    switch (pov) {
+                        case 0 -> x = MOVE_VEL;
+                        case 90 -> y = -MOVE_VEL;
+                        case 180 -> x = -MOVE_VEL;
+                        case 270 -> y = MOVE_VEL;
+                    }
+                    if (x != 0 || y != 0) return robotCentric.withVelocityX(x).withVelocityY(y);
+                }
+
                 double velocityX = -driver.getLeftY() * MaxSpeed; // Drive forward with negative Y (forward)
                 double velocityY = -driver.getLeftX() * MaxSpeed; // Drive left with negative X (left)
                 double rotationalRate = -driver.getRightX() * MaxAngularRate; // Drive counterclockwise with negative X (left)
@@ -134,7 +148,7 @@ public class RobotContainer {
                 } else {
                     velocityX *= drivetrain.getCurrentSpeedMulti();
                     velocityY *= drivetrain.getCurrentSpeedMulti();
-                }
+                } 
 
                 if (fieldCentric) {
                     return drive.withVelocityX(velocityX)
