@@ -65,7 +65,7 @@ public class WristSubsys extends SubsystemBase {
     START_POS(0),
     MIN_POS(Constants.Configs.WRIST_CONFIG.SoftwareLimitSwitch.ReverseSoftLimitThreshold),
     
-    HUMAN_PLAYER_INTAKE(16.1147), //14
+    HUMAN_PLAYER_INTAKE(16.1147),
     L2_L3(-10.75),
     L4(-5),
     REMOVE_ALGAE(23),

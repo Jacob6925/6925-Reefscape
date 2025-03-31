@@ -95,7 +95,7 @@ public class ElevatorSubsys extends SubsystemBase {
     L2(9),
     L3(16.35),
     L4(MAX_HEIGHT.rotations),
-    HUMAN_PLAYER_INTAKE(1.5), //2.1 a bit too high
+    HUMAN_PLAYER_INTAKE(1.5),
     REMOVE_ALGAE_L2(L2.rotations + 1),
     REMOVE_ALGAE_L3(L3.rotations + 1),
     DEPOSIT_BALL(2),
@@ -118,6 +118,12 @@ public class ElevatorSubsys extends SubsystemBase {
     pidController.setGoal(new TrapezoidProfile.State());
     elevatorMotor.setPosition(0);
     secondElevatorMotor.setPosition(0);
+  }
+
+  public void updateGoal() {
+    pidController.setGoal(elevatorMotor.getPosition().getValueAsDouble());
+    elevatorMotor.set(0);
+    controlBySpeed = false;
   }
 
   public double getMotorRotations() {

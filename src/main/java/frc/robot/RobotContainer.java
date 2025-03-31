@@ -14,8 +14,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -39,10 +37,10 @@ import frc.robot.subsystems.WristSubsys.WristSetpoint;
 public class RobotContainer {
     private static RobotContainer instance;
 
-    private final ElevatorSubsys elevatorSubsys;
-    private final PipeIntakeSubsys pipeIntakeSubsys;
-    private final BallIntakeSubsys ballIntakeSubsys;
-    private final WristSubsys wristSubsys;
+    private final ElevatorSubsys elevatorSubsys = new ElevatorSubsys();
+    private final PipeIntakeSubsys pipeIntakeSubsys = new PipeIntakeSubsys();
+    private final BallIntakeSubsys ballIntakeSubsys = new BallIntakeSubsys();
+    private final WristSubsys wristSubsys = new WristSubsys();
 
     private final CommandXboxController driver = new CommandXboxController(0);
     private final CommandX3DController operator = new CommandX3DController(1);
@@ -72,12 +70,6 @@ public class RobotContainer {
 
     public RobotContainer() {    
         instance = this;
-
-        elevatorSubsys = new ElevatorSubsys();
-        pipeIntakeSubsys = new PipeIntakeSubsys();
-        ballIntakeSubsys = new BallIntakeSubsys();
-        wristSubsys = new WristSubsys();
-
         RobotCommands.init(elevatorSubsys, pipeIntakeSubsys, ballIntakeSubsys, wristSubsys);
 
         registerNamedCommands();
@@ -93,26 +85,28 @@ public class RobotContainer {
 
     private void configureBindings() {
         configureSwerveButtons();
+        driver.button(8).onTrue(elevatorSubsys.setSpeedCommand(-0.025)).onFalse(new InstantCommand(() -> elevatorSubsys.resetElevatorSetpoint()));
+
         operator.trigger().onTrue(new ConditionalCommand(
             RobotCommands.setSpeedPipeAndBall(PipeIntakeSpeed.L1_EJECT), //true
             RobotCommands.setSpeedPipeAndBall(PipeIntakeSpeed.EJECT), //false
             () -> elevatorSubsys.getPIDController().getGoal().position == ElevatorPosition.L1.rotations) //condition - at L1
         ).onFalse(RobotCommands.setSpeedPipeAndBall(PipeIntakeSpeed.OFF));
-
         operator.button(2).onTrue(RobotCommands.humanPlayerActionsCommand()).onFalse(RobotCommands.resetIntakesAndElevator());
 
         operator.button(10).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.L4, WristSetpoint.L4)).onFalse(RobotCommands.resetElevator());
         operator.button(9).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.L3, WristSetpoint.L2_L3)).onFalse(RobotCommands.resetElevator());
         operator.button(12).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.L2, WristSetpoint.L2_L3)).onFalse(RobotCommands.resetElevator());
         operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1)).onFalse(RobotCommands.resetElevator());
-
         operator.button(7).onTrue(RobotCommands.moveElevAndIntakeBall(ElevatorPosition.REMOVE_ALGAE_L2)).onFalse(RobotCommands.resetIntakesAndElevator());
         operator.button(8).onTrue(RobotCommands.moveElevAndIntakeBall(ElevatorPosition.REMOVE_ALGAE_L3)).onFalse(RobotCommands.resetIntakesAndElevator());
+
         // operator.button(3).onTrue(RobotCommands.liftAndShoot());
         operator.button(6).onTrue(RobotCommands.outtakeBall(ElevatorPosition.DEPOSIT_BALL)).onFalse(RobotCommands.resetIntakesAndElevator());
         operator.button(4).onTrue(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.HOLD_BALL)).onFalse(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF));
 
-        driver.button(8).onTrue(elevatorSubsys.setSpeedCommand(-0.025)).onFalse(new InstantCommand(() -> elevatorSubsys.resetElevatorSetpoint()));
+        operator.povUp().whileTrue(elevatorSubsys.setSpeedCommand(0.1).finallyDo((e) -> elevatorSubsys.updateGoal()));
+        operator.povDown().whileTrue(elevatorSubsys.setSpeedCommand(-0.05).finallyDo((e) -> elevatorSubsys.updateGoal()));
     }
 
     private void configureSwerveButtons() {
@@ -124,12 +118,12 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> {
                 SmartDashboard.putBoolean("Field Oriented", fieldCentric);
 
-                int pov = driver.getHID().getPOV();
-                if (pov != -1) {
+                int driverPov = driver.getHID().getPOV();
+                if (driverPov != -1) {
                     double x = 0;
                     double y = 0;
                     double MOVE_VEL = 0.5;
-                    switch (pov) {
+                    switch (driverPov) {
                         case 0 -> x = MOVE_VEL;
                         case 90 -> y = -MOVE_VEL;
                         case 180 -> x = -MOVE_VEL;
