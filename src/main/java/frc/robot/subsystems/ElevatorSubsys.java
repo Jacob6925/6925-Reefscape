@@ -126,6 +126,16 @@ public class ElevatorSubsys extends SubsystemBase {
     controlBySpeed = false;
   }
 
+  public Command dynamicallyAdjustSetpoint(boolean positive) {
+    return new InstantCommand(() -> {
+      double goalPos = pidController.getGoal().position;
+      double rotations = 0.1;
+      if (goalPos == ElevatorPosition.MIN_HEIGHT.rotations || goalPos == ElevatorPosition.MAX_HEIGHT.rotations) return;
+      if (goalPos == ElevatorPosition.REMOVE_ALGAE_L2.rotations || goalPos == ElevatorPosition.REMOVE_ALGAE_L3.rotations) rotations = 0.25;
+      pidController.setGoal(pidController.getGoal().position + rotations);
+    });
+  }
+
   public double getMotorRotations() {
     return elevatorMotor.getPosition().getValueAsDouble();
   }

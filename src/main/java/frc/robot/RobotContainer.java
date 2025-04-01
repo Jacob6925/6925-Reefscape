@@ -105,8 +105,10 @@ public class RobotContainer {
         operator.button(6).onTrue(RobotCommands.outtakeBall(ElevatorPosition.DEPOSIT_BALL)).onFalse(RobotCommands.resetIntakesAndElevator());
         operator.button(4).onTrue(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.HOLD_BALL)).onFalse(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF));
 
-        operator.povUp().whileTrue(elevatorSubsys.setSpeedCommand(0.1).finallyDo((e) -> elevatorSubsys.updateGoal()));
-        operator.povDown().whileTrue(elevatorSubsys.setSpeedCommand(-0.05).finallyDo((e) -> elevatorSubsys.updateGoal()));
+        operator.povUp().onTrue(elevatorSubsys.dynamicallyAdjustSetpoint(true));
+        operator.povDown().onTrue(elevatorSubsys.dynamicallyAdjustSetpoint(false));
+        // operator.povUp().whileTrue(elevatorSubsys.setSpeedCommand(0.1).finallyDo((e) -> elevatorSubsys.updateGoal()));
+        // operator.povDown().whileTrue(elevatorSubsys.setSpeedCommand(-0.05).finallyDo((e) -> elevatorSubsys.updateGoal()));
     }
 
     private void configureSwerveButtons() {
