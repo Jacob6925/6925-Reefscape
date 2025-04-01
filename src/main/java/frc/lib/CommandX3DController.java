@@ -25,6 +25,6 @@ public class CommandX3DController extends CommandGenericHID {
     }
 
     public double getSlider() {
-        return getHID().getRawAxis(3);
+        return -getHID().getRawAxis(3);
     }
 }

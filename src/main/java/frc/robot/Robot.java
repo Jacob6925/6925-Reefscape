@@ -13,12 +13,14 @@ public class Robot extends TimedRobot {
   private static Robot instance;
   private Command m_autonomousCommand;
 
+  private final FlightSimSwerveRobotContainer m_robotContainer;
   // private final TestingRobotContainer m_robotContainer;
-  private final RobotContainer m_robotContainer;
+  // private final RobotContainer m_robotContainer;
 
   public Robot() {
-    m_robotContainer = new RobotContainer();
+    m_robotContainer = new FlightSimSwerveRobotContainer();
     // m_robotContainer = new TestingRobotContainer();
+    // m_robotContainer = new RobotContainer();
     instance = this;
   }
 

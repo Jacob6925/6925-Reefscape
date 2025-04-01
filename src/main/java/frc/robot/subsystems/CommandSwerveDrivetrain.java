@@ -352,6 +352,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return Commands.runOnce(() -> speedMulti = (speedMulti == 1.0 ? multi : 1.0), this);
     }
 
+    public void setSpeedMulti(double multi) {
+        speedMulti = multi;
+    }
+
     public double getCurrentSpeedMulti() {
         return speedMulti;
     }
