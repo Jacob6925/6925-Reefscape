@@ -94,15 +94,15 @@ public class RobotContainer {
         ).onFalse(RobotCommands.setSpeedPipeAndBall(PipeIntakeSpeed.OFF));
         operator.button(2).onTrue(RobotCommands.humanPlayerActionsCommand()).onFalse(RobotCommands.resetIntakesAndElevator());
 
-        operator.button(10).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.L4, WristSetpoint.L4)).onFalse(RobotCommands.resetElevator());
-        operator.button(9).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.L3, WristSetpoint.L2_L3)).onFalse(RobotCommands.resetElevator());
-        operator.button(12).onTrue(RobotCommands.elevatorLevelActions(ElevatorPosition.L2, WristSetpoint.L2_L3)).onFalse(RobotCommands.resetElevator());
+        operator.button(10).onTrue(RobotCommands.elevatorAndWristActions(ElevatorPosition.L4, WristSetpoint.L4)).onFalse(RobotCommands.resetElevator());
+        operator.button(9).onTrue(RobotCommands.elevatorAndWristActions(ElevatorPosition.L3, WristSetpoint.L2_L3)).onFalse(RobotCommands.resetElevator());
+        operator.button(12).onTrue(RobotCommands.elevatorAndWristActions(ElevatorPosition.L2, WristSetpoint.L2_L3)).onFalse(RobotCommands.resetElevator());
         operator.button(11).onTrue(elevatorSubsys.goTo(ElevatorPosition.L1)).onFalse(RobotCommands.resetElevator());
         operator.button(7).onTrue(RobotCommands.moveElevAndIntakeBall(ElevatorPosition.REMOVE_ALGAE_L2)).onFalse(RobotCommands.resetIntakesAndElevator());
         operator.button(8).onTrue(RobotCommands.moveElevAndIntakeBall(ElevatorPosition.REMOVE_ALGAE_L3)).onFalse(RobotCommands.resetIntakesAndElevator());
 
         // operator.button(3).onTrue(RobotCommands.liftAndShoot());
-        operator.button(6).onTrue(RobotCommands.outtakeBall(ElevatorPosition.DEPOSIT_BALL)).onFalse(RobotCommands.resetIntakesAndElevator());
+        operator.button(6).onTrue(RobotCommands.lolipopActions()).onFalse(RobotCommands.resetIntakesAndElevator());
         operator.button(4).onTrue(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.HOLD_BALL)).onFalse(ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.OFF));
 
         operator.povUp().onTrue(elevatorSubsys.dynamicallyAdjustSetpoint(true));
@@ -181,9 +181,9 @@ public class RobotContainer {
 
     private void registerNamedCommands() {
         NamedCommands.registerCommand("MoveTo-L1", elevatorSubsys.goTo(ElevatorPosition.L1));
-        NamedCommands.registerCommand("MoveTo-L2", RobotCommands.elevatorLevelActions(ElevatorPosition.L2, WristSetpoint.L2_L3));
-        NamedCommands.registerCommand("MoveTo-L3", RobotCommands.elevatorLevelActions(ElevatorPosition.L3, WristSetpoint.L2_L3));
-        NamedCommands.registerCommand("MoveTo-L4", RobotCommands.elevatorLevelActions(ElevatorPosition.L4, WristSetpoint.L4));
+        NamedCommands.registerCommand("MoveTo-L2", RobotCommands.elevatorAndWristActions(ElevatorPosition.L2, WristSetpoint.L2_L3));
+        NamedCommands.registerCommand("MoveTo-L3", RobotCommands.elevatorAndWristActions(ElevatorPosition.L3, WristSetpoint.L2_L3));
+        NamedCommands.registerCommand("MoveTo-L4", RobotCommands.elevatorAndWristActions(ElevatorPosition.L4, WristSetpoint.L4));
         NamedCommands.registerCommand("MoveTo-HP", RobotCommands.humanPlayerActionsCommand());
         NamedCommands.registerCommand("ResetElevator", RobotCommands.resetElevator());
         NamedCommands.registerCommand("IntakePipe", RobotCommands.setSpeedPipeAndBall(PipeIntakeSpeed.INTAKE));

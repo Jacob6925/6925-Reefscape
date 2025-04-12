@@ -67,12 +67,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "MoveTo-HP"
@@ -81,7 +75,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 4.0
           }
         },
         {
@@ -94,6 +88,12 @@
           "type": "named",
           "data": {
             "name": "ResetElevator"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HP-1L"
           }
         }
       ]

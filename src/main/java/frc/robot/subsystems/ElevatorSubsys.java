@@ -132,6 +132,7 @@ public class ElevatorSubsys extends SubsystemBase {
       double rotations = 0.1;
       if (goalPos == ElevatorPosition.MIN_HEIGHT.rotations || goalPos == ElevatorPosition.MAX_HEIGHT.rotations) return;
       if (goalPos == ElevatorPosition.REMOVE_ALGAE_L2.rotations || goalPos == ElevatorPosition.REMOVE_ALGAE_L3.rotations) rotations = 0.25;
+      if (goalPos == ElevatorPosition.HUMAN_PLAYER_INTAKE.rotations) rotations = 0.5;
       pidController.setGoal(pidController.getGoal().position + rotations);
     });
   }

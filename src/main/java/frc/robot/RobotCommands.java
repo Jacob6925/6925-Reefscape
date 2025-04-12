@@ -43,7 +43,7 @@ public final class RobotCommands {
         );
     }
 
-    public static Command elevatorLevelActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint, double waitTime) {
+    public static Command elevatorAndWristActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint, double waitTime) {
         return new SequentialCommandGroup(
             elevatorSubsys.goTo(elevatorPosition),
             new WaitCommand(waitTime),
@@ -51,13 +51,13 @@ public final class RobotCommands {
         );
     }
 
-    public static Command elevatorLevelActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint) {
-        return elevatorLevelActions(elevatorPosition, wristSetpoint, 0.75);
+    public static Command elevatorAndWristActions(ElevatorPosition elevatorPosition, WristSetpoint wristSetpoint) {
+        return elevatorAndWristActions(elevatorPosition, wristSetpoint, 0.75);
     }
 
     public static Command moveElevAndIntakeBall(ElevatorPosition elevatorPosition) {
         return new SequentialCommandGroup(
-            elevatorLevelActions(elevatorPosition, WristSetpoint.REMOVE_ALGAE, 0.75),
+            elevatorAndWristActions(elevatorPosition, WristSetpoint.REMOVE_ALGAE, 0.75),
             new WaitCommand(0.5),
             ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.INTAKE)
         );
@@ -117,6 +117,13 @@ public final class RobotCommands {
             elevatorSubsys.goTo(elevatorPosition),
             new WaitCommand(1),
             ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.EJECT)
+        );
+    }
+
+    public static Command lolipopActions() {
+        return new SequentialCommandGroup(
+            elevatorAndWristActions(ElevatorPosition.L1, WristSetpoint.HOLDING_POS),
+            ballIntakeSubsys.setSpeedCommand(BallIntakeSpeed.INTAKE)
         );
     }
 }

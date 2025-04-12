@@ -3,70 +3,52 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.82,
-        "y": 5.143
+        "x": 0.93,
+        "y": 7.32
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.103592444229215,
-        "y": 5.000010259332485
-      },
-      "isLocked": true,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 3.5341145833333325,
-        "y": 5.8837673611111105
-      },
-      "prevControl": {
-        "x": 4.458536580241196,
-        "y": 5.310934867894865
-      },
-      "nextControl": {
-        "x": 2.3156858135523084,
-        "y": 6.638785731871095
+        "x": 1.7791815180567117,
+        "y": 6.775354888728761
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.93,
-        "y": 7.32
+        "x": 5.364930555555555,
+        "y": 5.184982638888889
       },
       "prevControl": {
-        "x": 2.313961805555554,
-        "y": 6.272111111111111
+        "x": 5.35143972872038,
+        "y": 6.0323401260821665
+      },
+      "nextControl": {
+        "x": 5.3693569046866685,
+        "y": 4.90696409169343
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.043489583333333,
+        "y": 4.6539062499999995
+      },
+      "prevControl": {
+        "x": 5.420585344058109,
+        "y": 5.395846509346847
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": -120.3956481621129
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [
     {
-      "name": "Very Slow",
-      "minWaypointRelativePos": 1.9,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 0.75,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    },
-    {
-      "name": "Approach",
-      "minWaypointRelativePos": 1.75,
+      "name": "Slow Approach",
+      "minWaypointRelativePos": 1.5,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 1.5,
@@ -90,13 +72,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 126.86999999999999
+    "rotation": -119.05499999999999
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.05499999999999
+    "rotation": 126.86999999999999
   },
   "useDefaultConstraints": true
 }
