@@ -10,11 +10,13 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -61,7 +63,10 @@ public class RobotContainer {
     private boolean fieldCentric = true;
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
-
+    
+    private final SwerveRequest.RobotCentricFacingAngle driveToAngle = new SwerveRequest.RobotCentricFacingAngle()
+        .withDriveRequestType(DriveRequestType.Velocity);
+        
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
@@ -81,11 +86,16 @@ public class RobotContainer {
         CameraServer.startAutomaticCapture(0).setConfigJson("{\"height\":120,\"pixelformat\":\"mjpeg\",\"properties\":[{\"name\":\"connect_verbose\",\"value\":1},{\"name\":\"raw_brightness\",\"value\":153},{\"name\":\"brightness\",\"value\":55},{\"name\":\"raw_contrast\",\"value\":2},{\"name\":\"contrast\",\"value\":20},{\"name\":\"raw_saturation\",\"value\":180},{\"name\":\"saturation\",\"value\":90},{\"name\":\"white_balance_temperature_auto\",\"value\":true},{\"name\":\"power_line_frequency\",\"value\":2},{\"name\":\"white_balance_temperature\",\"value\":4500},{\"name\":\"raw_sharpness\",\"value\":25},{\"name\":\"sharpness\",\"value\":50},{\"name\":\"backlight_compensation\",\"value\":0},{\"name\":\"exposure_auto\",\"value\":3},{\"name\":\"raw_exposure_absolute\",\"value\":156},{\"name\":\"exposure_absolute\",\"value\":46},{\"name\":\"pan_absolute\",\"value\":0},{\"name\":\"tilt_absolute\",\"value\":0},{\"name\":\"zoom_absolute\",\"value\":0}],\"width\":160}");
         // CameraServer.startAutomaticCapture(1);
         // http://roborio-6925-frc.local:1181/
+
+        drivetrain.setupPhotonVision();
+        driveToAngle.HeadingController = new PhoenixPIDController(10, 0.0, 0.0);
+        driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);    
     }
 
     private void configureBindings() {
         configureSwerveButtons();
         driver.button(8).onTrue(elevatorSubsys.setSpeedCommand(-0.025)).onFalse(new InstantCommand(() -> elevatorSubsys.resetElevatorSetpoint()));
+        driver.back().onTrue(drivetrain.autoAlign()).onFalse(drivetrain.manualAlign());
 
         operator.trigger().onTrue(new ConditionalCommand(
             RobotCommands.setSpeedPipeAndBall(PipeIntakeSpeed.L1_EJECT), //true
@@ -121,10 +131,10 @@ public class RobotContainer {
                 SmartDashboard.putBoolean("Field Oriented", fieldCentric);
 
                 int driverPov = driver.getHID().getPOV();
+                double MOVE_VEL = 0.5;
                 if (driverPov != -1) {
                     double x = 0;
                     double y = 0;
-                    double MOVE_VEL = 0.5;
                     switch (driverPov) {
                         case 0 -> x = MOVE_VEL;
                         case 90 -> y = -MOVE_VEL;
@@ -144,8 +154,19 @@ public class RobotContainer {
                 } else {
                     velocityX *= drivetrain.getCurrentSpeedMulti();
                     velocityY *= drivetrain.getCurrentSpeedMulti();
-                } 
+                }
 
+                if (drivetrain.autoAligning()) {
+                    // if (drivetrain.getAutoAlignRotation() != 0) {
+                        // if (!drivetrain.autoAlignFinished()) {
+                            double sign = (drivetrain.getAutoAlignStartYaw() > 0 ? 1 : -1);
+                            return driveToAngle.withTargetDirection(Rotation2d.fromDegrees(drivetrain.getAutoAlignStartYaw() + sign*drivetrain.getAutoAlignRotation()));
+                        // } else {
+                            // return robotCentric.withVelocityX(MOVE_VEL);
+                        // }
+                    // }
+                }
+                
                 if (fieldCentric) {
                     return drive.withVelocityX(velocityX)
                         .withVelocityY(velocityY)

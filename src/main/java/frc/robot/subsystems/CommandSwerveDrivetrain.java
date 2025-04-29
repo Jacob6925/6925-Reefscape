@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.xml.crypto.dsig.keyinfo.RetrievalMethod;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
@@ -21,6 +23,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,11 +31,14 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.lib.PhotonVisionHandler;
 import frc.lib.TunerConstants;
 import frc.lib.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.Constants;
+import frc.robot.SimulationRobotContainer;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -294,6 +300,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         SmartDashboard.putBoolean("Speed Reduced", speedMulti != 1);
+
+        // if (!autoAlignFinished) {
+        //     double targetYaw = getAutoAlignStartYaw() + getAutoAlignRotation();
+        //     double currentYaw = getPigeon2().getYaw().getValueAsDouble();
+        //     if (Math.abs(targetYaw - currentYaw) <= 1) {
+        //         autoAlignFinished = true;
+        //     }
+        // }
+
+        if (SimulationRobotContainer.getInstance() == null) return;
+        SimulationRobotContainer.getInstance().field.setRobotPose(getState().Pose);
     }
 
     private void startSimThread() {
@@ -358,5 +375,73 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public double getCurrentSpeedMulti() {
         return speedMulti;
+    }
+
+    /*
+     * Aligning to April Tags
+     */
+    // Setup photonvision
+    private PhotonVisionHandler photonVision = null;
+    public boolean autoAlign = false;
+    private double lastPVYaw = 0;
+    private boolean alignStarted = false;
+    private double startYaw = 0;
+    private boolean autoAlignFinished = false;
+
+    public void setupPhotonVision() {
+        PortForwarder.add(5800, "photonvision.local", 5800);
+        photonVision = new PhotonVisionHandler("Arducam_OV9782_USB_Camera");
+    }
+
+    public Command autoAlign() {
+        return new InstantCommand(() -> {
+            autoAlign = true;
+            alignStarted = false;
+            autoAlignFinished = false;
+            startYaw = getPigeon2().getYaw().getValueAsDouble();
+        });
+    }
+
+    public Command manualAlign() {
+        return new InstantCommand(() -> {
+            autoAlign = false;
+        });
+    }
+
+    public boolean autoAligning() {
+        if (photonVision == null) return false;
+        return autoAlign;
+    }
+
+    public double getAutoAlignRotation() {
+        double yaw = lastPVYaw;
+        if (!autoAlign) {
+            lastPVYaw = 0;
+            return 0;
+        } else if (!alignStarted) {
+            alignStarted = true;
+            yaw = photonVision.getTargetYaw();
+            if (yaw == PhotonVisionHandler.NO_TARGET_FOUND) {
+                lastPVYaw = 0;
+                return 0;
+            }
+        } else {
+            if (photonVision.getLastResult() != null) {
+                yaw = photonVision.getLastResult().getYaw();
+            } else {
+                yaw = 0;
+            }
+        }
+
+        lastPVYaw = -yaw;
+        return lastPVYaw;
+    }
+
+    public double getAutoAlignStartYaw() {
+        return startYaw;
+    }
+
+    public boolean autoAlignFinished() {
+        return autoAlignFinished;
     }
 }
