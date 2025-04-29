@@ -10,8 +10,10 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.lib.CommandX3DController;
@@ -31,6 +33,10 @@ public class FlightSimSwerveRobotContainer {
     public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+    
+    private final SwerveRequest.RobotCentricFacingAngle driveToAngle = new SwerveRequest.RobotCentricFacingAngle()
+        .withDeadband(0)
+        .withDriveRequestType(DriveRequestType.Velocity);    
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     
@@ -39,10 +45,15 @@ public class FlightSimSwerveRobotContainer {
     public FlightSimSwerveRobotContainer() {    
         instance = this;
         configureSwerveButtons();
+        driver.button(7).onTrue(drivetrain.autoAlign()).onFalse(drivetrain.manualAlign());
 
-        CameraServer.startAutomaticCapture(0).setConfigJson("{\"height\":120,\"pixelformat\":\"mjpeg\",\"properties\":[{\"name\":\"connect_verbose\",\"value\":1},{\"name\":\"raw_brightness\",\"value\":153},{\"name\":\"brightness\",\"value\":55},{\"name\":\"raw_contrast\",\"value\":2},{\"name\":\"contrast\",\"value\":20},{\"name\":\"raw_saturation\",\"value\":180},{\"name\":\"saturation\",\"value\":90},{\"name\":\"white_balance_temperature_auto\",\"value\":true},{\"name\":\"power_line_frequency\",\"value\":2},{\"name\":\"white_balance_temperature\",\"value\":4500},{\"name\":\"raw_sharpness\",\"value\":25},{\"name\":\"sharpness\",\"value\":50},{\"name\":\"backlight_compensation\",\"value\":0},{\"name\":\"exposure_auto\",\"value\":3},{\"name\":\"raw_exposure_absolute\",\"value\":156},{\"name\":\"exposure_absolute\",\"value\":46},{\"name\":\"pan_absolute\",\"value\":0},{\"name\":\"tilt_absolute\",\"value\":0},{\"name\":\"zoom_absolute\",\"value\":0}],\"width\":160}");
+        // CameraServer.startAutomaticCapture(0).setConfigJson("{\"height\":120,\"pixelformat\":\"mjpeg\",\"properties\":[{\"name\":\"connect_verbose\",\"value\":1},{\"name\":\"raw_brightness\",\"value\":153},{\"name\":\"brightness\",\"value\":55},{\"name\":\"raw_contrast\",\"value\":2},{\"name\":\"contrast\",\"value\":20},{\"name\":\"raw_saturation\",\"value\":180},{\"name\":\"saturation\",\"value\":90},{\"name\":\"white_balance_temperature_auto\",\"value\":true},{\"name\":\"power_line_frequency\",\"value\":2},{\"name\":\"white_balance_temperature\",\"value\":4500},{\"name\":\"raw_sharpness\",\"value\":25},{\"name\":\"sharpness\",\"value\":50},{\"name\":\"backlight_compensation\",\"value\":0},{\"name\":\"exposure_auto\",\"value\":3},{\"name\":\"raw_exposure_absolute\",\"value\":156},{\"name\":\"exposure_absolute\",\"value\":46},{\"name\":\"pan_absolute\",\"value\":0},{\"name\":\"tilt_absolute\",\"value\":0},{\"name\":\"zoom_absolute\",\"value\":0}],\"width\":160}");
         // CameraServer.startAutomaticCapture(1);
         // http://roborio-6925-frc.local:1181/
+
+        drivetrain.setupPhotonVision();
+        driveToAngle.HeadingController = new PhoenixPIDController(10, 0.0, 0.0);
+        driveToAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);  
     }
 
     private void configureSwerveButtons() {
@@ -54,7 +65,15 @@ public class FlightSimSwerveRobotContainer {
 
                 double velocityX = -driver.getPitch() * MaxSpeed * drivetrain.getCurrentSpeedMulti(); // Drive forward with negative Y (forward)
                 double velocityY = -driver.getRoll() * MaxSpeed * drivetrain.getCurrentSpeedMulti(); // Drive left with negative X (left)
-                double rotationalRate = -driver.getYaw() * MaxAngularRate; // Drive counterclockwise with negative X (left)
+                double rotationalRate = -driver.getYaw() * MaxAngularRate * drivetrain.getCurrentSpeedMulti(); // Drive counterclockwise with negative X (left)
+
+                if (drivetrain.autoAligning()) {
+                    if (drivetrain.getAutoAlignRotation() != 0) {
+                        if (!drivetrain.autoAlignFinished()) {
+                            return driveToAngle.withTargetDirection(Rotation2d.fromDegrees(drivetrain.getAutoAlignStartYaw() + drivetrain.getAutoAlignRotation()));
+                        }
+                    }
+                }
 
                 return drive.withVelocityX(velocityX)
                     .withVelocityY(velocityY)

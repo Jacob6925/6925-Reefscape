@@ -15,11 +15,13 @@ public class Robot extends TimedRobot {
 
   // private final FlightSimSwerveRobotContainer m_robotContainer;
   // private final TestingRobotContainer m_robotContainer;
+  // private final SimulationRobotContainer m_robotContainer;
   private final RobotContainer m_robotContainer;
 
   public Robot() {
     // m_robotContainer = new FlightSimSwerveRobotContainer();
     // m_robotContainer = new TestingRobotContainer();
+    // m_robotContainer = new SimulationRobotContainer();
     m_robotContainer = new RobotContainer();
     instance = this;
   }
@@ -34,7 +36,9 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    if (RobotContainer.getInstance() != null && RobotContainer.getInstance().drivetrain != null) RobotContainer.getInstance().drivetrain.manualAlign();
+  }
 
   @Override
   public void disabledPeriodic() {}
